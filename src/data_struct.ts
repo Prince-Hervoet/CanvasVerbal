@@ -16,20 +16,20 @@ export class ElementList {
 
   pushBack(element: VOElement) {
     const co = new Coverage();
-    co.data = element;
-    co.next = null;
-    co.prev = null;
+    co.setData(element);
+    co.setNext(null);
+    co.setPrev(null);
     if (this.#head === null || this.#tail === null) {
       this.#head = co;
       this.#tail = co;
     } else {
       const temp = this.#tail;
-      this.#tail.next = co;
-      co.prev = temp;
+      this.#tail.setNext(co);
+      co.setPrev(temp);
       this.#tail = co;
     }
     this.#size++;
-    this.#mp.set(co.data.id, co);
+    this.#mp.set(co.getData()!.id, co);
   }
 
   pushFront() {}
@@ -50,7 +50,30 @@ export class ElementList {
 }
 
 class Coverage {
-  data: VOElement | null;
-  next: Coverage | null;
-  prev: Coverage | null;
+  #data: VOElement | null;
+  #next: Coverage | null;
+  #prev: Coverage | null;
+
+  getData() {
+    return this.#data;
+  }
+
+  getNext() {
+    return this.#next;
+  }
+
+  getPrev() {
+    return this.#prev;
+  }
+
+  setData(data: VOElement | null) {
+    this.#data = data;
+  }
+
+  setNext(next: Coverage | null) {
+    this.#next = next;
+  }
+  setPrev(prev: Coverage | null) {
+    this.#prev = prev;
+  }
 }
