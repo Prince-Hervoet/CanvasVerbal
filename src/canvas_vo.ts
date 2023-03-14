@@ -1,10 +1,19 @@
-import { VOElement, ElementList, BASE_SHAPE_TYPE } from "./type";
+import { VOElement } from "./type";
 import { nanoid } from "nanoid";
+import { ElementList } from "./data_struct";
+import { BASE_SHAPE_TYPE } from "./util";
 
 const CANVAS_MAP = new Map();
 
-function newCanvasVO(name) {
+export function newCanvasVO(name) {
   const canvasDOM = document.createElement("canvas");
+  const cvo = new CanvasVO(canvasDOM);
+  CANVAS_MAP.set(name, cvo);
+  return cvo;
+}
+
+export function getCanvasByName(name: string) {
+  return CANVAS_MAP.get(name);
 }
 
 class CanvasVO {
@@ -23,10 +32,9 @@ class CanvasVO {
 function getRect(
   left: number,
   top: number,
-  fill: string,
   width: number,
   height: number,
-  name: string
+  info: object
 ) {
   const id = nanoid();
   const ve = new VOElement();
@@ -36,6 +44,7 @@ function getRect(
   ve.boundingBox_x2 = left + width;
   ve.boundingBox_y2 = top + height;
   ve.isBaseShapeType = true;
-  ve.shapeType = "rect";
+  ve.shapeType = BASE_SHAPE_TYPE.RECT;
+  ve.info = info;
   return ve;
 }

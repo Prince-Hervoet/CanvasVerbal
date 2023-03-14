@@ -1,60 +1,11 @@
-export enum BASE_SHAPE_TYPE {
-  RECT = "rect",
-  CIRCLE = "circle",
-}
-
-export class ElementList {
-  #head: Coverage | null;
-  #tail: Coverage | null;
-  #size: number;
-
-  constructor() {
-    this.#head = null;
-    this.#tail = null;
-    this.#size = 0;
-  }
-
-  pushBack(element: VOElement) {
-    const co = new Coverage();
-    co.el = element;
-    co.next = null;
-    co.prev = null;
-    if (this.#head === null || this.#tail === null) {
-      this.#head = co;
-      this.#tail = co;
-    } else {
-      const temp = this.#tail;
-      this.#tail.next = co;
-      co.prev = temp;
-      this.#tail = co;
-    }
-    this.#size++;
-  }
-
-  pushFront() {}
-
-  deleteNode() {}
-
-  getTail() {}
-
-  getHead() {}
-
-  size() {
-    return this.#size;
-  }
-}
-
-class Coverage {
-  el: VOElement;
-  next: Coverage | null;
-  prev: Coverage | null;
+class Point {
+  x: number;
+  y: number;
 }
 
 class Edge {
-  x1: number;
-  y1: number;
-  x2: number;
-  y2: number;
+  point1: Point;
+  point2: Point;
 }
 
 export class VOElement {
@@ -78,6 +29,10 @@ export class VOElement {
   info: any;
   // 边信息
   edges: Edge[];
+  // 如果是圆形
+  center: Point;
+  // 半径
+  r: number;
 
   constructor() {}
 }
