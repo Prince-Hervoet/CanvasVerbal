@@ -9,6 +9,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "nanoid": "^4.0.1"
+    "nanoid": "^4.0.1",
+    "typescript": "^4.9.5"
   }
 }
