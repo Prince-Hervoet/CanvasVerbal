@@ -1,6 +1,7 @@
 import { Checkbox } from "./../type/Checkbox.js";
 import { ObjectList } from "../type/ObjectList.js";
 import { CanvasVerbalStatusType, isInBoundingBox, radiographic, } from "../util/common.js";
+import { PitchOnBox } from "../type/PitchOnBox.js";
 const BODY_DOM = document.querySelector("body");
 export function canvasVerbal(id, width, height, styleInfo, parent) {
     // 双层画布的包围元素
@@ -119,7 +120,11 @@ CanvasVerbal.mouseMove = (event, canvasVerbal) => {
         case CanvasVerbalStatusType.NONE:
             const obj = CanvasVerbal.judgeMouseInObject(mouseLeft, mouseTop, canvasVerbal);
             if (obj) {
-                console.log(obj);
+                canvasVerbal.cleanAll(canvasVerbal.firstCtx);
+                PitchOnBox.render(obj.left - 1, obj.top - 1, obj.left + obj.width + 1, obj.top + obj.height + 1, canvasVerbal.firstCtx);
+            }
+            else {
+                canvasVerbal.cleanAll(canvasVerbal.firstCtx);
             }
             break;
         case CanvasVerbalStatusType.COMMON_MOUSE_DOWN:

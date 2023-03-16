@@ -82,6 +82,8 @@ export class VerbalObject {
     }
   }
 
+  protected calculatePosition(args: any) {}
+
   public lastRender(ctx: CanvasRenderingContext2D) {
     ctx.save();
     this.setCtx(ctx);

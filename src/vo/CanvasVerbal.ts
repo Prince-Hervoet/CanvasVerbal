@@ -6,6 +6,7 @@ import {
   isInBoundingBox,
   radiographic,
 } from "../util/common.js";
+import { PitchOnBox } from "../type/PitchOnBox.js";
 
 const BODY_DOM: any = document.querySelector("body");
 export function canvasVerbal(
@@ -168,7 +169,16 @@ export class CanvasVerbal {
           canvasVerbal
         );
         if (obj) {
-          console.log(obj);
+          canvasVerbal.cleanAll(canvasVerbal.firstCtx!);
+          PitchOnBox.render(
+            obj.left - 1,
+            obj.top - 1,
+            obj.left + obj.width + 1,
+            obj.top + obj.height + 1,
+            canvasVerbal.firstCtx!
+          );
+        } else {
+          canvasVerbal.cleanAll(canvasVerbal.firstCtx!);
         }
         break;
       case CanvasVerbalStatusType.COMMON_MOUSE_DOWN:
