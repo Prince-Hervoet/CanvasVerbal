@@ -59,6 +59,9 @@ export class CanvasVerbal {
             canvasDom.addEventListener("mousedown", (event) => {
                 CanvasVerbal.mouseDown(event, this);
             });
+            canvasDom.addEventListener("mouseup", (event) => {
+                CanvasVerbal.mouseUp(event, this);
+            });
         };
         this.id = id;
         this.firstCanvas = fitstCanvasDom;
@@ -119,7 +122,6 @@ CanvasVerbal.mouseMove = (event, canvasVerbal) => {
             }
             break;
         case CanvasVerbalStatusType.COMMON_MOUSE_DOWN:
-            console.log("12312312312312312312313");
             // 显示复选矩形
             canvasVerbal.cleanAll(canvasVerbal.firstCtx);
             Checkbox.render(canvasVerbal.commonMouseDownPoint[0], canvasVerbal.commonMouseDownPoint[1], mouseLeft, mouseTop, canvasVerbal.firstCtx);
@@ -136,7 +138,6 @@ CanvasVerbal.mouseDown = (event, canvasVerbal) => {
         canvasVerbal.status = CanvasVerbalStatusType.COMMON_MOUSE_DOWN;
         canvasVerbal.commonMouseDownPoint[0] = mouseLeft;
         canvasVerbal.commonMouseDownPoint[1] = mouseTop;
-        console.log("asdfasdfasdf");
     }
 };
 // 鼠标放开事件
@@ -144,4 +145,5 @@ CanvasVerbal.mouseUp = (event, canvasVerbal) => {
     canvasVerbal.status = CanvasVerbalStatusType.NONE;
     canvasVerbal.commonMouseDownPoint[0] = 0;
     canvasVerbal.commonMouseDownPoint[1] = 0;
+    canvasVerbal.cleanAll(canvasVerbal.firstCtx);
 };

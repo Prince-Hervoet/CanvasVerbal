@@ -14,9 +14,10 @@ export class Checkbox {
     const remainY = biggerY - smallerY;
     const topLeftCornerX = biggerX - remainX;
     const topLeftCornerY = smallerY;
-    ctx.save();
-    ctx.fillStyle = "rgba(255,0,0,0.5)";
+    ctx.beginPath();
+    ctx.fillStyle = "rgba(255,0,0,0.1)";
     ctx.rect(topLeftCornerX, topLeftCornerY, remainX, remainY);
-    ctx.restore();
+    ctx.fill();
+    ctx.closePath();
   }
 }
