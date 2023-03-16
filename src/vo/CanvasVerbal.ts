@@ -141,12 +141,12 @@ export class CanvasVerbal {
         )
       ) {
         if (radiographic(mouseLeft, mouseTop, obj.edges!)) {
-          return true;
+          return obj;
         }
       }
       run = run.next;
     }
-    return false;
+    return null;
   };
 
   // 单击事件
@@ -162,10 +162,13 @@ export class CanvasVerbal {
 
     switch (canvasVerbal.status) {
       case CanvasVerbalStatusType.NONE:
-        if (
-          CanvasVerbal.judgeMouseInObject(mouseLeft, mouseTop, canvasVerbal)
-        ) {
-          console.log("进去了");
+        const obj = CanvasVerbal.judgeMouseInObject(
+          mouseLeft,
+          mouseTop,
+          canvasVerbal
+        );
+        if (obj) {
+          console.log(obj);
         }
         break;
       case CanvasVerbalStatusType.COMMON_MOUSE_DOWN:
