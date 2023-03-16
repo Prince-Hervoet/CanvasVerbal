@@ -1,6 +1,11 @@
+import { Checkbox } from "./../type/Checkbox.js";
 import { Point, VerbalObject } from "../type/VerbalObject.js";
 import { ObjectList } from "../type/ObjectList.js";
-import { isInBoundingBox, radiographic } from "../util/common.js";
+import {
+  CanvasVerbalStatusType,
+  isInBoundingBox,
+  radiographic,
+} from "../util/common.js";
 
 const BODY_DOM: any = document.querySelector("body");
 export function canvasVerbal(
@@ -62,8 +67,10 @@ export class CanvasVerbal {
   protected objects: ObjectList = new ObjectList();
   // 当前选中的物体
   private activeObjectId: string | null = null;
-  // 是否处于拖拽状态
-  private isDraging: boolean = false;
+  // 状态
+  private status: number = 0;
+
+  private commonMouseDownPoint: number[] = [];
   constructor(
     id: string,
     fitstCanvasDom: HTMLCanvasElement,
@@ -89,7 +96,7 @@ export class CanvasVerbal {
   }
 
   public render() {
-    this.cleanAll();
+    this.cleanAll(this.secondCtx!);
     let run = this.objects.head?.next;
     while (run) {
       const obj = run.val;
@@ -98,8 +105,8 @@ export class CanvasVerbal {
     }
   }
 
-  public cleanAll() {
-    this.secondCtx?.clearRect(0, 0, this.width, this.height);
+  public cleanAll(ctx: CanvasRenderingContext2D) {
+    ctx.clearRect(0, 0, this.width, this.height);
   }
 
   private initEventBinding = (canvasDom: HTMLCanvasElement) => {
@@ -112,21 +119,16 @@ export class CanvasVerbal {
     canvasDom.addEventListener("mousedown", (event) => {
       CanvasVerbal.mouseDown(event, this);
     });
+    canvasDom.addEventListener("mouseup", (event) => {
+      CanvasVerbal.mouseUp(event, this);
+    });
   };
 
-  // 单击事件
-  private static singleClick = (event: any, canvasVerbal: CanvasVerbal) => {
-    const mouseLeft = event.clientX;
-    const mouseTop = event.clientY;
-
-    let run = canvasVerbal.objects.head?.next;
-    while (run) {}
-  };
-
-  // 鼠标移动事件
-  private static mouseMove = (event: any, canvasVerbal: CanvasVerbal) => {
-    const mouseLeft = event.offsetX;
-    const mouseTop = event.offsetY;
+  private static judgeMouseInObject = (
+    mouseLeft: number,
+    mouseTop: number,
+    canvasVerbal: CanvasVerbal
+  ) => {
     let run = canvasVerbal.objects.head?.next;
     while (run) {
       const obj = run.val!;
@@ -139,13 +141,65 @@ export class CanvasVerbal {
         )
       ) {
         if (radiographic(mouseLeft, mouseTop, obj.edges!)) {
-          console.log("进入了");
-          return;
+          return true;
         }
       }
       run = run.next;
     }
+    return false;
+  };
+
+  // 单击事件
+  private static singleClick = (event: any, canvasVerbal: CanvasVerbal) => {
+    const mouseLeft = event.clientX;
+    const mouseTop = event.clientY;
+  };
+
+  // 鼠标移动事件
+  private static mouseMove = (event: any, canvasVerbal: CanvasVerbal) => {
+    const mouseLeft = event.offsetX;
+    const mouseTop = event.offsetY;
+
+    switch (canvasVerbal.status) {
+      case CanvasVerbalStatusType.NONE:
+        if (
+          CanvasVerbal.judgeMouseInObject(mouseLeft, mouseTop, canvasVerbal)
+        ) {
+          console.log("进去了");
+        }
+        break;
+      case CanvasVerbalStatusType.COMMON_MOUSE_DOWN:
+        console.log("12312312312312312312313");
+
+        // 显示复选矩形
+        canvasVerbal.cleanAll(canvasVerbal.firstCtx!);
+        Checkbox.render(
+          canvasVerbal.commonMouseDownPoint[0],
+          canvasVerbal.commonMouseDownPoint[1],
+          mouseLeft,
+          mouseTop,
+          canvasVerbal.firstCtx!
+        );
+        break;
+    }
   };
   // 鼠标按下事件
-  private static mouseDown = (event: any, canvasVerbal: CanvasVerbal) => {};
+  private static mouseDown = (event: any, canvasVerbal: CanvasVerbal) => {
+    const mouseLeft = event.offsetX;
+    const mouseTop = event.offsetY;
+    if (CanvasVerbal.judgeMouseInObject(mouseLeft, mouseTop, canvasVerbal)) {
+    } else {
+      canvasVerbal.status = CanvasVerbalStatusType.COMMON_MOUSE_DOWN;
+      canvasVerbal.commonMouseDownPoint[0] = mouseLeft;
+      canvasVerbal.commonMouseDownPoint[1] = mouseTop;
+      console.log("asdfasdfasdf");
+    }
+  };
+
+  // 鼠标放开事件
+  private static mouseUp = (event: any, canvasVerbal: CanvasVerbal) => {
+    canvasVerbal.status = CanvasVerbalStatusType.NONE;
+    canvasVerbal.commonMouseDownPoint[0] = 0;
+    canvasVerbal.commonMouseDownPoint[1] = 0;
+  };
 }

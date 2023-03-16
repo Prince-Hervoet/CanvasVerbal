@@ -1,5 +1,7 @@
+import { Checkbox } from "./../type/Checkbox.js";
 import { ObjectList } from "../type/ObjectList.js";
-import { isInBoundingBox, radiographic } from "../util/common.js";
+import { CanvasVerbalStatusType, isInBoundingBox, radiographic, } from "../util/common.js";
+const BODY_DOM = document.querySelector("body");
 export function canvasVerbal(id, width, height, styleInfo, parent) {
     // 双层画布的包围元素
     const boundingDiv = document.createElement("div");
@@ -44,8 +46,9 @@ export class CanvasVerbal {
         this.objects = new ObjectList();
         // 当前选中的物体
         this.activeObjectId = null;
-        // 是否处于拖拽状态
-        this.isDraging = false;
+        // 状态
+        this.status = 0;
+        this.commonMouseDownPoint = [];
         this.initEventBinding = (canvasDom) => {
             canvasDom.addEventListener("click", (event) => {
                 CanvasVerbal.singleClick(event, this);
@@ -74,7 +77,7 @@ export class CanvasVerbal {
     }
     render() {
         var _a;
-        this.cleanAll();
+        this.cleanAll(this.secondCtx);
         let run = (_a = this.objects.head) === null || _a === void 0 ? void 0 : _a.next;
         while (run) {
             const obj = run.val;
@@ -82,35 +85,63 @@ export class CanvasVerbal {
             run = run.next;
         }
     }
-    cleanAll() {
-        var _a;
-        (_a = this.secondCtx) === null || _a === void 0 ? void 0 : _a.clearRect(0, 0, this.width, this.height);
+    cleanAll(ctx) {
+        ctx.clearRect(0, 0, this.width, this.height);
     }
 }
-// 单击事件
-CanvasVerbal.singleClick = (event, canvasVerbal) => {
+CanvasVerbal.judgeMouseInObject = (mouseLeft, mouseTop, canvasVerbal) => {
     var _a;
-    const mouseLeft = event.clientX;
-    const mouseTop = event.clientY;
-    let run = (_a = canvasVerbal.objects.head) === null || _a === void 0 ? void 0 : _a.next;
-    while (run) { }
-};
-// 鼠标移动事件
-CanvasVerbal.mouseMove = (event, canvasVerbal) => {
-    var _a;
-    const mouseLeft = event.offsetX;
-    const mouseTop = event.offsetY;
     let run = (_a = canvasVerbal.objects.head) === null || _a === void 0 ? void 0 : _a.next;
     while (run) {
         const obj = run.val;
         if (isInBoundingBox(mouseLeft, mouseTop, obj.boundingBoxp1, obj.boundingBoxp2)) {
             if (radiographic(mouseLeft, mouseTop, obj.edges)) {
-                console.log("进入了");
-                return;
+                return true;
             }
         }
         run = run.next;
     }
+    return false;
+};
+// 单击事件
+CanvasVerbal.singleClick = (event, canvasVerbal) => {
+    const mouseLeft = event.clientX;
+    const mouseTop = event.clientY;
+};
+// 鼠标移动事件
+CanvasVerbal.mouseMove = (event, canvasVerbal) => {
+    const mouseLeft = event.offsetX;
+    const mouseTop = event.offsetY;
+    switch (canvasVerbal.status) {
+        case CanvasVerbalStatusType.NONE:
+            if (CanvasVerbal.judgeMouseInObject(mouseLeft, mouseTop, canvasVerbal)) {
+                console.log("进去了");
+            }
+            break;
+        case CanvasVerbalStatusType.COMMON_MOUSE_DOWN:
+            console.log("12312312312312312312313");
+            // 显示复选矩形
+            canvasVerbal.cleanAll(canvasVerbal.firstCtx);
+            Checkbox.render(canvasVerbal.commonMouseDownPoint[0], canvasVerbal.commonMouseDownPoint[1], mouseLeft, mouseTop, canvasVerbal.firstCtx);
+            break;
+    }
 };
 // 鼠标按下事件
-CanvasVerbal.mouseDown = (event, canvasVerbal) => { };
+CanvasVerbal.mouseDown = (event, canvasVerbal) => {
+    const mouseLeft = event.offsetX;
+    const mouseTop = event.offsetY;
+    if (CanvasVerbal.judgeMouseInObject(mouseLeft, mouseTop, canvasVerbal)) {
+    }
+    else {
+        canvasVerbal.status = CanvasVerbalStatusType.COMMON_MOUSE_DOWN;
+        canvasVerbal.commonMouseDownPoint[0] = mouseLeft;
+        canvasVerbal.commonMouseDownPoint[1] = mouseTop;
+        console.log("asdfasdfasdf");
+    }
+};
+// 鼠标放开事件
+CanvasVerbal.mouseUp = (event, canvasVerbal) => {
+    canvasVerbal.status = CanvasVerbalStatusType.NONE;
+    canvasVerbal.commonMouseDownPoint[0] = 0;
+    canvasVerbal.commonMouseDownPoint[1] = 0;
+};

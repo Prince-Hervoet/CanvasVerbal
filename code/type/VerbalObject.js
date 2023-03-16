@@ -41,8 +41,6 @@ export class VerbalObject {
         this.isPitchOn = false;
         // 是否可视
         this.isShow = true;
-        // 是否填充
-        this.isFill = false;
         // 是否描边
         this.isStroke = true;
         const id = Date.now().toString(); // ⇨ '9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d'();
@@ -50,15 +48,20 @@ export class VerbalObject {
     }
     render(ctx) { }
     setCtx(ctx) {
-        const that = this;
+        const that = this.styleInfo;
+        ctx.strokeStyle = "#f00";
+        ctx.fillStyle = "#f00";
         for (const a of BrushAttributeType) {
             if (a in that) {
                 switch (a) {
                     case "fill":
                         ctx.fillStyle = that[a];
                         break;
-                    case "border":
+                    case "border-color":
                         ctx.strokeStyle = that[a];
+                        break;
+                    case "border-size":
+                        ctx.lineWidth = that[a];
                         break;
                 }
             }

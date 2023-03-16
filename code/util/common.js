@@ -4,6 +4,16 @@ export var BaseShapeType;
     BaseShapeType["CIRCLE"] = "circle";
 })(BaseShapeType || (BaseShapeType = {}));
 export const BrushAttributeType = ["fill", "border", "border-size"];
+export var CanvasVerbalStatusType;
+(function (CanvasVerbalStatusType) {
+    CanvasVerbalStatusType[CanvasVerbalStatusType["NONE"] = 0] = "NONE";
+    // 选中物体
+    CanvasVerbalStatusType[CanvasVerbalStatusType["PITCH_ON"] = 1] = "PITCH_ON";
+    // 正在拖拽
+    CanvasVerbalStatusType[CanvasVerbalStatusType["DRAGING"] = 2] = "DRAGING";
+    // 普通按下
+    CanvasVerbalStatusType[CanvasVerbalStatusType["COMMON_MOUSE_DOWN"] = 3] = "COMMON_MOUSE_DOWN";
+})(CanvasVerbalStatusType || (CanvasVerbalStatusType = {}));
 // 射线检测
 export function radiographic(left, top, edges) {
     let count = 0;

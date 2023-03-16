@@ -8,6 +8,7 @@ const test = new Rect({
     height: 100,
     left: 20,
     top: 20,
+    styleInfo: { fill: "blue", "border-size": 4 },
 });
 console.log(test);
 cv.addObject(test);

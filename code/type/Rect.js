@@ -43,9 +43,6 @@ export class Rect extends VerbalObject {
         const x2 = this.left + this.width, y2 = this.top;
         const x3 = this.left + this.width, y3 = this.top + this.height;
         const x4 = this.left, y4 = this.top + this.height;
-        ctx.strokeStyle = "#f00"; // 描边样式设置为红色
-        ctx.fillStyle = "#00f"; // 填充样式设置为蓝色
-        ctx.lineWidth = 5;
         ctx.beginPath();
         ctx.moveTo(x1, y1);
         ctx.lineTo(x2, y2);
@@ -53,7 +50,7 @@ export class Rect extends VerbalObject {
         ctx.lineTo(x4, y4);
         ctx.lineTo(x1, y1);
         ctx.closePath();
-        if (this.isFill) {
+        if (this.styleInfo.fill) {
             ctx.fill();
         }
         if (this.isStroke) {

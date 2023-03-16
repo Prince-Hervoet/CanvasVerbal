@@ -1,10 +1,21 @@
 import { Edge, Point } from "./../type/VerbalObject";
+
 export enum BaseShapeType {
   RECT = "rect",
   CIRCLE = "circle",
 }
 
 export const BrushAttributeType = ["fill", "border", "border-size"];
+
+export enum CanvasVerbalStatusType {
+  NONE = 0,
+  // 选中物体
+  PITCH_ON = 1,
+  // 正在拖拽
+  DRAGING = 2,
+  // 普通按下
+  COMMON_MOUSE_DOWN = 3,
+}
 
 // 射线检测
 export function radiographic(left: number, top: number, edges: Edge[]) {

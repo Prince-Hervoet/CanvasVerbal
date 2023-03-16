@@ -34,7 +34,7 @@ export class VerbalObject {
   public edges: Edge[] | null = null;
 
   // style
-  public styleInfo: object = {};
+  public styleInfo: any = {};
 
   // 放大缩小
   public scaleX: number = 0;
@@ -51,8 +51,6 @@ export class VerbalObject {
   public isPitchOn: boolean = false;
   // 是否可视
   public isShow: boolean = true;
-  // 是否填充
-  public isFill: boolean = false;
   // 是否描边
   public isStroke: boolean = true;
 
@@ -64,15 +62,20 @@ export class VerbalObject {
   protected render(ctx: CanvasRenderingContext2D) {}
 
   protected setCtx(ctx: CanvasRenderingContext2D) {
-    const that: any = this;
+    const that: any = this.styleInfo;
+    ctx.strokeStyle = "#f00";
+    ctx.fillStyle = "#f00";
     for (const a of BrushAttributeType) {
       if (a in that) {
         switch (a) {
           case "fill":
             ctx.fillStyle = that[a];
             break;
-          case "border":
+          case "border-color":
             ctx.strokeStyle = that[a];
+            break;
+          case "border-size":
+            ctx.lineWidth = that[a];
             break;
         }
       }
