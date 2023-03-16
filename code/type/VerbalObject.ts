@@ -21,11 +21,14 @@ export class Edge {
 }
 
 export class VerbalObject {
-  // 包围盒位置大小
+  // 位置大小
   public left: number = 0;
   public top: number = 0;
   public width: number = 0;
   public height: number = 0;
+
+  public boundingBoxp1: Point | null = null;
+  public boundingBoxp2: Point | null = null;
 
   // 边
   public edges: Edge[] | null = null;

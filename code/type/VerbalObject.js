@@ -17,11 +17,13 @@ export class Edge {
 }
 export class VerbalObject {
     constructor() {
-        // 包围盒位置大小
+        // 位置大小
         this.left = 0;
         this.top = 0;
         this.width = 0;
         this.height = 0;
+        this.boundingBoxp1 = null;
+        this.boundingBoxp2 = null;
         // 边
         this.edges = null;
         // style

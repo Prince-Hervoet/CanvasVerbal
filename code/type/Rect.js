@@ -13,6 +13,8 @@ export class Rect extends VerbalObject {
             }
         }
         this.setEdges();
+        this.boundingBoxp1 = new Point(this.left, this.top);
+        this.boundingBoxp2 = new Point(this.left + this.width, this.top + this.height);
     }
     setEdges() {
         const x1 = this.left, y1 = this.top;
@@ -27,6 +29,11 @@ export class Rect extends VerbalObject {
         const e2 = new Edge(p2, p3);
         const e3 = new Edge(p3, p4);
         const e4 = new Edge(p4, p1);
+        this.edges = [];
+        this.edges.push(e1);
+        this.edges.push(e2);
+        this.edges.push(e3);
+        this.edges.push(e4);
     }
     render(ctx) {
         if (this.width === 0 || this.height === 0 || !this.isShow) {
