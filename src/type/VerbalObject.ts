@@ -1,5 +1,6 @@
 import { BrushAttributeType } from "../util/common.js";
 
+//! 点
 export class Point {
   public left: number = 0;
   public top: number = 0;
@@ -10,6 +11,7 @@ export class Point {
   }
 }
 
+//! 边
 export class Edge {
   public p1: Point | null = null;
   public p2: Point | null = null;
@@ -20,12 +22,14 @@ export class Edge {
   }
 }
 
+//! 附加风格
 export class StyleInfo {
   fill: string = "";
   border_size: number = 0;
   border_color: string = "";
 }
 
+//! 基础风格
 export interface IBaseStyleInfo {
   width: number;
   height: number;
@@ -33,19 +37,22 @@ export interface IBaseStyleInfo {
   top: number;
 }
 
+//! 对象基类
 export class VerbalObject {
-  // 内容位置大小
+  //* 内容位置
   public left: number = 0;
   public top: number = 0;
+  //* 内容大小
   public width: number = 0;
   public height: number = 0;
 
-  // 加上描边大小
+  //* 加上描边的总大小
   public sumLeft: number = 0;
   public sumTop: number = 0;
   public sumWidth: number = 0;
   public sumHeight: number = 0;
 
+  //* 包围盒位置
   public boundingBoxp1: Point | null = null;
   public boundingBoxp2: Point | null = null;
 
@@ -70,12 +77,13 @@ export class VerbalObject {
   public isPitchOn: boolean = false;
   // 是否可视
   public isShow: boolean = true;
-  // 是否描边
-  public isStroke: boolean = true;
 
   constructor(baseStyleInfo: IBaseStyleInfo, styleInfo: StyleInfo) {
-    const id = "object_" + Date.now().toString(); // ⇨ '9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d'();
+    //* 生成一个id
+    const id = "object_" + Date.now().toString();
     this.objectId = id;
+
+    //* 基础属性赋值
     const that: any = this;
     const baseT: any = baseStyleInfo;
     for (const base in baseStyleInfo) {
@@ -83,8 +91,12 @@ export class VerbalObject {
         that[base] = baseT[base];
       }
     }
+
+    //* 附加属性赋值
     this.styleInfo = styleInfo;
+    //* 计算加上描边的总大小
     this.calculatePosition(styleInfo);
+    //* 计算包围盒大小
     this.boundingBoxp1 = new Point(this.sumLeft, this.sumTop);
     this.boundingBoxp2 = new Point(
       this.sumLeft + this.sumWidth,
@@ -96,6 +108,7 @@ export class VerbalObject {
 
   protected setEdges() {}
 
+  //? 设置ctx的颜色等
   protected setCtx(ctx: CanvasRenderingContext2D) {
     const that = this.styleInfo;
     ctx.strokeStyle = "#f00";
@@ -123,6 +136,7 @@ export class VerbalObject {
     }
   }
 
+  //? 改变位置的重新计算函数
   public changePosition(newLeft: number, newTop: number) {
     this.left = newLeft;
     this.top = newTop;
@@ -135,6 +149,7 @@ export class VerbalObject {
     this.setEdges();
   }
 
+  //? 计算描边
   protected calculatePosition(styleInfo: any) {
     const key = "border_size";
     if (key in styleInfo) {

@@ -1,4 +1,5 @@
 import { BrushAttributeType } from "../util/common.js";
+//! 点
 export class Point {
     constructor(left, top) {
         this.left = 0;
@@ -7,6 +8,7 @@ export class Point {
         this.top = top;
     }
 }
+//! 边
 export class Edge {
     constructor(p1, p2) {
         this.p1 = null;
@@ -15,6 +17,7 @@ export class Edge {
         this.p2 = p2;
     }
 }
+//! 附加风格
 export class StyleInfo {
     constructor() {
         this.fill = "";
@@ -22,18 +25,21 @@ export class StyleInfo {
         this.border_color = "";
     }
 }
+//! 对象基类
 export class VerbalObject {
     constructor(baseStyleInfo, styleInfo) {
-        // 内容位置大小
+        //* 内容位置
         this.left = 0;
         this.top = 0;
+        //* 内容大小
         this.width = 0;
         this.height = 0;
-        // 加上描边大小
+        //* 加上描边的总大小
         this.sumLeft = 0;
         this.sumTop = 0;
         this.sumWidth = 0;
         this.sumHeight = 0;
+        //* 包围盒位置
         this.boundingBoxp1 = null;
         this.boundingBoxp2 = null;
         // 边
@@ -53,10 +59,10 @@ export class VerbalObject {
         this.isPitchOn = false;
         // 是否可视
         this.isShow = true;
-        // 是否描边
-        this.isStroke = true;
-        const id = "object_" + Date.now().toString(); // ⇨ '9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d'();
+        //* 生成一个id
+        const id = "object_" + Date.now().toString();
         this.objectId = id;
+        //* 基础属性赋值
         const that = this;
         const baseT = baseStyleInfo;
         for (const base in baseStyleInfo) {
@@ -64,13 +70,17 @@ export class VerbalObject {
                 that[base] = baseT[base];
             }
         }
+        //* 附加属性赋值
         this.styleInfo = styleInfo;
+        //* 计算加上描边的总大小
         this.calculatePosition(styleInfo);
+        //* 计算包围盒大小
         this.boundingBoxp1 = new Point(this.sumLeft, this.sumTop);
         this.boundingBoxp2 = new Point(this.sumLeft + this.sumWidth, this.sumTop + this.sumHeight);
     }
     render(ctx) { }
     setEdges() { }
+    //? 设置ctx的颜色等
     setCtx(ctx) {
         const that = this.styleInfo;
         ctx.strokeStyle = "#f00";
@@ -97,6 +107,7 @@ export class VerbalObject {
             }
         }
     }
+    //? 改变位置的重新计算函数
     changePosition(newLeft, newTop) {
         this.left = newLeft;
         this.top = newTop;
@@ -105,6 +116,7 @@ export class VerbalObject {
         this.boundingBoxp2 = new Point(this.sumLeft + this.sumWidth, this.sumTop + this.sumHeight);
         this.setEdges();
     }
+    //? 计算描边
     calculatePosition(styleInfo) {
         const key = "border_size";
         if (key in styleInfo) {

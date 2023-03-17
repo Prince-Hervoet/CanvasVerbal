@@ -1,12 +1,15 @@
 import { Edge, Point } from "./../type/VerbalObject";
 
+//* 基础类型名称
 export enum BaseShapeType {
   RECT = "rect",
   CIRCLE = "circle",
 }
 
+//* 设置ctx的基本属性
 export const BrushAttributeType = ["fill", "border_color", "border_size"];
 
+//* 画布主类的几种状态
 export enum CanvasVerbalStatusType {
   NONE = 0,
   // 选中物体
@@ -17,7 +20,7 @@ export enum CanvasVerbalStatusType {
   COMMON_MOUSE_DOWN = 3,
 }
 
-// 射线检测
+//? 射线检测，检测鼠标是否在一个几何图形内部
 export function radiographic(left: number, top: number, edges: Edge[]) {
   let count = 0;
   for (const e of edges) {
@@ -41,7 +44,7 @@ export function radiographic(left: number, top: number, edges: Edge[]) {
   return false;
 }
 
-// 判断是否在包围盒内
+//? 判断是否在包围盒内
 export function isInBoundingBox(
   left: number,
   top: number,
@@ -57,6 +60,7 @@ export function isInBoundingBox(
   } else if (top < p1.top && top < p2.top) {
     return false;
   }
-
   return true;
 }
+
+export function isCloseToEdges(aEdges: Edge[], bEdges: Edge[]) {}

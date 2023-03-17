@@ -9,6 +9,8 @@ import {
 import { PitchOnBox } from "../type/PitchOnBox.js";
 
 const BODY_DOM: any = document.querySelector("body");
+
+//* 获取创建的canvas主类并将DOM添加到指定的父级元素中
 export function canvasVerbal(
   id: string,
   width: number,
@@ -16,12 +18,12 @@ export function canvasVerbal(
   styleInfo: any,
   parent: HTMLElement
 ) {
-  // 双层画布的包围元素
+  //? 双层画布的包围元素
   const boundingDiv = document.createElement("div");
   boundingDiv.setAttribute("style", "position: relative;");
   boundingDiv;
 
-  // 下层画布DOM
+  //? 下层画布DOM
   const secondCanvasDom: HTMLCanvasElement = document.createElement("canvas");
   secondCanvasDom.id = id;
   secondCanvasDom.width = width;
@@ -32,7 +34,7 @@ export function canvasVerbal(
   }
   secondCanvasDom.setAttribute("style", styleStr);
 
-  // 上层画布DOM
+  //? 上层画布DOM
   const firstCanvasDom: HTMLCanvasElement = document.createElement("canvas");
   firstCanvasDom.width = width;
   firstCanvasDom.height = height;
@@ -48,17 +50,18 @@ export function canvasVerbal(
   return cv;
 }
 
+// 画布主类，包含canvasDOM、上下文、状态机等
 export class CanvasVerbal {
   private id: string;
   private width: number;
   private height: number;
-  // 第一层画布
+  //! 第一层画布 用于处理鼠标事件
   private firstCanvas: HTMLCanvasElement | null = null;
-  // 第二层画布
+  //! 第二层画布 用于渲染最后的结果
   private secondCanvas: HTMLCanvasElement | null = null;
   // 缓冲
   private bufferCanvas: HTMLCanvasElement | null = null;
-  // 父级元素
+  //! 父级元素 包装两层画布的父
   private boundingDiv: HTMLElement | null = null;
   // 第一层ctx
   private firstCtx: CanvasRenderingContext2D | null = null;
@@ -66,13 +69,13 @@ export class CanvasVerbal {
   private secondCtx: CanvasRenderingContext2D | null = null;
   // 元素列表
   protected objects: ObjectList = new ObjectList();
-  // 当前选中的物体
+  // 当前选中  的物体
   private activeObject: VerbalObject | null = null;
   // 鼠标点击拖拽时，鼠标和物体左上角坐标的差值
   private activeMouseRemainObject: number[] = [];
   // 状态
   private status: number = 0;
-
+  // 普通按下鼠标按键的起始点
   private commonMouseDownPoint: number[] = [];
   constructor(
     id: string,
@@ -80,6 +83,7 @@ export class CanvasVerbal {
     secondCanvasDom: HTMLCanvasElement,
     boundingDiv: HTMLElement
   ) {
+    //? 初始化各种dom和画布大小
     this.id = id;
     this.firstCanvas = fitstCanvasDom;
     this.secondCanvas = secondCanvasDom;
@@ -89,15 +93,19 @@ export class CanvasVerbal {
     this.height = secondCanvasDom.height;
     this.boundingDiv = boundingDiv;
 
+    //? 在第一层画布上绑定事件
     this.initEventBinding(this.firstCanvas);
   }
 
+  //? 添加对象方法
   public addObject(...args: VerbalObject[]) {
     args.forEach((el) => {
       this.objects.pushBack(el);
     });
+    return this;
   }
 
+  //? 将对象列表进行渲染
   public render() {
     this.cleanAll(this.secondCtx!);
     let run = this.objects.head?.next;
@@ -108,6 +116,7 @@ export class CanvasVerbal {
     }
   }
 
+  //? 在第一层渲染事件对象
   public eventRender(obj: VerbalObject) {
     if (!obj) {
       return;
@@ -116,10 +125,12 @@ export class CanvasVerbal {
     obj.lastRender(this.firstCtx!);
   }
 
+  //? 清空画布
   public cleanAll(ctx: CanvasRenderingContext2D) {
     ctx.clearRect(0, 0, this.width, this.height);
   }
 
+  //? 初始化事件绑定（绑定在第一层上）
   private initEventBinding = (canvasDom: HTMLCanvasElement) => {
     canvasDom.addEventListener("click", (event) => {
       CanvasVerbal.singleClick(event, this);
@@ -135,11 +146,13 @@ export class CanvasVerbal {
     });
   };
 
+  //? 判断鼠标坐标是否在某个对象范围内
   private static judgeMouseInObject = (
     mouseLeft: number,
     mouseTop: number,
     canvasVerbal: CanvasVerbal
   ) => {
+    //* 从后面往前面遍历，先得到的对象就是响应的层级最高的对象
     let run = canvasVerbal.objects.tail;
     while (run && run !== canvasVerbal.objects.head) {
       const obj = run.val!;
@@ -160,13 +173,13 @@ export class CanvasVerbal {
     return null;
   };
 
-  // 单击事件
+  //? 单击事件
   private static singleClick = (event: any, canvasVerbal: CanvasVerbal) => {
     const mouseLeft = event.clientX;
     const mouseTop = event.clientY;
   };
 
-  // 鼠标移动事件
+  //? 鼠标移动事件
   private static mouseMove = (event: any, canvasVerbal: CanvasVerbal) => {
     const mouseLeft = event.offsetX;
     const mouseTop = event.offsetY;

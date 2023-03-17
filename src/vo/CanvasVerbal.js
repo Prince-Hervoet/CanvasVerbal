@@ -3,12 +3,13 @@ import { ObjectList } from "../type/ObjectList.js";
 import { CanvasVerbalStatusType, isInBoundingBox, radiographic, } from "../util/common.js";
 import { PitchOnBox } from "../type/PitchOnBox.js";
 const BODY_DOM = document.querySelector("body");
+//* 获取创建的canvas主类并将DOM添加到指定的父级元素中
 export function canvasVerbal(id, width, height, styleInfo, parent) {
-    // 双层画布的包围元素
+    //? 双层画布的包围元素
     const boundingDiv = document.createElement("div");
     boundingDiv.setAttribute("style", "position: relative;");
     boundingDiv;
-    // 下层画布DOM
+    //? 下层画布DOM
     const secondCanvasDom = document.createElement("canvas");
     secondCanvasDom.id = id;
     secondCanvasDom.width = width;
@@ -18,7 +19,7 @@ export function canvasVerbal(id, width, height, styleInfo, parent) {
         styleStr = s + ": " + styleInfo[s] + ";";
     }
     secondCanvasDom.setAttribute("style", styleStr);
-    // 上层画布DOM
+    //? 上层画布DOM
     const firstCanvasDom = document.createElement("canvas");
     firstCanvasDom.width = width;
     firstCanvasDom.height = height;
@@ -29,15 +30,16 @@ export function canvasVerbal(id, width, height, styleInfo, parent) {
     parent.appendChild(boundingDiv);
     return cv;
 }
+// 画布主类，包含canvasDOM、上下文、状态机等
 export class CanvasVerbal {
     constructor(id, fitstCanvasDom, secondCanvasDom, boundingDiv) {
-        // 第一层画布
+        //! 第一层画布 用于处理鼠标事件
         this.firstCanvas = null;
-        // 第二层画布
+        //! 第二层画布 用于渲染最后的结果
         this.secondCanvas = null;
         // 缓冲
         this.bufferCanvas = null;
-        // 父级元素
+        //! 父级元素 包装两层画布的父
         this.boundingDiv = null;
         // 第一层ctx
         this.firstCtx = null;
@@ -51,7 +53,9 @@ export class CanvasVerbal {
         this.activeMouseRemainObject = [];
         // 状态
         this.status = 0;
+        // 普通按下鼠标按键的起始点
         this.commonMouseDownPoint = [];
+        //? 初始化事件绑定（绑定在第一层上）
         this.initEventBinding = (canvasDom) => {
             canvasDom.addEventListener("click", (event) => {
                 CanvasVerbal.singleClick(event, this);
@@ -66,6 +70,7 @@ export class CanvasVerbal {
                 CanvasVerbal.mouseUp(event, this);
             });
         };
+        //? 初始化各种dom和画布大小
         this.id = id;
         this.firstCanvas = fitstCanvasDom;
         this.secondCanvas = secondCanvasDom;
@@ -74,13 +79,17 @@ export class CanvasVerbal {
         this.width = secondCanvasDom.width;
         this.height = secondCanvasDom.height;
         this.boundingDiv = boundingDiv;
+        //? 在第一层画布上绑定事件
         this.initEventBinding(this.firstCanvas);
     }
+    //? 添加对象方法
     addObject(...args) {
         args.forEach((el) => {
             this.objects.pushBack(el);
         });
+        return this;
     }
+    //? 将对象列表进行渲染
     render() {
         var _a;
         this.cleanAll(this.secondCtx);
@@ -91,6 +100,7 @@ export class CanvasVerbal {
             run = run.next;
         }
     }
+    //? 在第一层渲染事件对象
     eventRender(obj) {
         if (!obj) {
             return;
@@ -98,11 +108,14 @@ export class CanvasVerbal {
         this.cleanAll(this.firstCtx);
         obj.lastRender(this.firstCtx);
     }
+    //? 清空画布
     cleanAll(ctx) {
         ctx.clearRect(0, 0, this.width, this.height);
     }
 }
+//? 判断鼠标坐标是否在某个对象范围内
 CanvasVerbal.judgeMouseInObject = (mouseLeft, mouseTop, canvasVerbal) => {
+    //* 从后面往前面遍历，先得到的对象就是响应的层级最高的对象
     let run = canvasVerbal.objects.tail;
     while (run && run !== canvasVerbal.objects.head) {
         const obj = run.val;
@@ -115,12 +128,12 @@ CanvasVerbal.judgeMouseInObject = (mouseLeft, mouseTop, canvasVerbal) => {
     }
     return null;
 };
-// 单击事件
+//? 单击事件
 CanvasVerbal.singleClick = (event, canvasVerbal) => {
     const mouseLeft = event.clientX;
     const mouseTop = event.clientY;
 };
-// 鼠标移动事件
+//? 鼠标移动事件
 CanvasVerbal.mouseMove = (event, canvasVerbal) => {
     const mouseLeft = event.offsetX;
     const mouseTop = event.offsetY;

@@ -1,9 +1,12 @@
+//* 基础类型名称
 export var BaseShapeType;
 (function (BaseShapeType) {
     BaseShapeType["RECT"] = "rect";
     BaseShapeType["CIRCLE"] = "circle";
 })(BaseShapeType || (BaseShapeType = {}));
+//* 设置ctx的基本属性
 export const BrushAttributeType = ["fill", "border_color", "border_size"];
+//* 画布主类的几种状态
 export var CanvasVerbalStatusType;
 (function (CanvasVerbalStatusType) {
     CanvasVerbalStatusType[CanvasVerbalStatusType["NONE"] = 0] = "NONE";
@@ -14,7 +17,7 @@ export var CanvasVerbalStatusType;
     // 普通按下
     CanvasVerbalStatusType[CanvasVerbalStatusType["COMMON_MOUSE_DOWN"] = 3] = "COMMON_MOUSE_DOWN";
 })(CanvasVerbalStatusType || (CanvasVerbalStatusType = {}));
-// 射线检测
+//? 射线检测，检测鼠标是否在一个几何图形内部
 export function radiographic(left, top, edges) {
     let count = 0;
     for (const e of edges) {
@@ -37,7 +40,7 @@ export function radiographic(left, top, edges) {
     }
     return false;
 }
-// 判断是否在包围盒内
+//? 判断是否在包围盒内
 export function isInBoundingBox(left, top, p1, p2) {
     if (left > p1.left && left > p2.left) {
         return false;

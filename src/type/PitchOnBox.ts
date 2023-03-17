@@ -1,3 +1,4 @@
+//! 选中状态高亮矩形
 export class PitchOnBox {
   public static render(
     startX: number,
@@ -16,10 +17,6 @@ export class PitchOnBox {
     const topLeftCornerY = smallerY;
     ctx.beginPath();
     ctx.fillStyle = "rgb(255,255,255,0.4)";
-    ctx.shadowColor = "#ccc";
-    ctx.shadowOffsetX = 6;
-    ctx.shadowOffsetY = 6;
-    ctx.shadowBlur = 10;
     ctx.rect(topLeftCornerX, topLeftCornerY, remainX, remainY);
     ctx.fill();
     ctx.closePath();
