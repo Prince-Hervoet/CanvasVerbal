@@ -3,7 +3,7 @@ export var BaseShapeType;
     BaseShapeType["RECT"] = "rect";
     BaseShapeType["CIRCLE"] = "circle";
 })(BaseShapeType || (BaseShapeType = {}));
-export const BrushAttributeType = ["fill", "border", "border-size"];
+export const BrushAttributeType = ["fill", "border_color", "border_size"];
 export var CanvasVerbalStatusType;
 (function (CanvasVerbalStatusType) {
     CanvasVerbalStatusType[CanvasVerbalStatusType["NONE"] = 0] = "NONE";

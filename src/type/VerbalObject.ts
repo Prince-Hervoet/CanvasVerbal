@@ -20,12 +20,31 @@ export class Edge {
   }
 }
 
+export class StyleInfo {
+  fill: string = "";
+  border_size: number = 0;
+  border_color: string = "";
+}
+
+export interface IBaseStyleInfo {
+  width: number;
+  height: number;
+  left: number;
+  top: number;
+}
+
 export class VerbalObject {
-  // 位置大小
+  // 内容位置大小
   public left: number = 0;
   public top: number = 0;
   public width: number = 0;
   public height: number = 0;
+
+  // 加上描边大小
+  public sumLeft: number = 0;
+  public sumTop: number = 0;
+  public sumWidth: number = 0;
+  public sumHeight: number = 0;
 
   public boundingBoxp1: Point | null = null;
   public boundingBoxp2: Point | null = null;
@@ -34,7 +53,7 @@ export class VerbalObject {
   public edges: Edge[] | null = null;
 
   // style
-  public styleInfo: any = {};
+  public styleInfo: StyleInfo = { fill: "", border_size: 0, border_color: "" };
 
   // 放大缩小
   public scaleX: number = 0;
@@ -54,35 +73,77 @@ export class VerbalObject {
   // 是否描边
   public isStroke: boolean = true;
 
-  constructor() {
-    const id = Date.now().toString(); // ⇨ '9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d'();
+  constructor(baseStyleInfo: IBaseStyleInfo, styleInfo: StyleInfo) {
+    const id = "object_" + Date.now().toString(); // ⇨ '9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d'();
     this.objectId = id;
+    const that: any = this;
+    const baseT: any = baseStyleInfo;
+    for (const base in baseStyleInfo) {
+      if (base in this) {
+        that[base] = baseT[base];
+      }
+    }
+    this.styleInfo = styleInfo;
+    this.calculatePosition(styleInfo);
+    this.boundingBoxp1 = new Point(this.sumLeft, this.sumTop);
+    this.boundingBoxp2 = new Point(
+      this.sumLeft + this.sumWidth,
+      this.sumTop + this.sumHeight
+    );
   }
 
   protected render(ctx: CanvasRenderingContext2D) {}
 
+  protected setEdges() {}
+
   protected setCtx(ctx: CanvasRenderingContext2D) {
-    const that: any = this.styleInfo;
+    const that = this.styleInfo;
     ctx.strokeStyle = "#f00";
     ctx.fillStyle = "#f00";
     for (const a of BrushAttributeType) {
       if (a in that) {
         switch (a) {
           case "fill":
-            ctx.fillStyle = that[a];
+            if (that[a]) {
+              ctx.fillStyle = that[a];
+            }
             break;
-          case "border-color":
-            ctx.strokeStyle = that[a];
+          case "border_color":
+            if (that[a]) {
+              ctx.strokeStyle = that[a];
+            }
             break;
-          case "border-size":
-            ctx.lineWidth = that[a];
+          case "border_size":
+            if (that[a]) {
+              ctx.lineWidth = that[a];
+            }
             break;
         }
       }
     }
   }
 
-  protected calculatePosition(args: any) {}
+  public changePosition(newLeft: number, newTop: number) {
+    this.left = newLeft;
+    this.top = newTop;
+    this.calculatePosition(this.styleInfo);
+    this.boundingBoxp1 = new Point(this.sumLeft, this.sumTop);
+    this.boundingBoxp2 = new Point(
+      this.sumLeft + this.sumWidth,
+      this.sumTop + this.sumHeight
+    );
+    this.setEdges();
+  }
+
+  protected calculatePosition(styleInfo: any) {
+    const key = "border_size";
+    if (key in styleInfo) {
+      this.sumWidth = this.width + styleInfo[key];
+      this.sumHeight = this.height + styleInfo[key];
+      this.sumLeft = this.left - styleInfo[key] / 2;
+      this.sumTop = this.top - styleInfo[key] / 2;
+    }
+  }
 
   public lastRender(ctx: CanvasRenderingContext2D) {
     ctx.save();

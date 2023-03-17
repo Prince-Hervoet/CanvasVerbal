@@ -67,7 +67,9 @@ export class CanvasVerbal {
   // 元素列表
   protected objects: ObjectList = new ObjectList();
   // 当前选中的物体
-  private activeObjectId: string | null = null;
+  private activeObject: VerbalObject | null = null;
+  // 鼠标点击拖拽时，鼠标和物体左上角坐标的差值
+  private activeMouseRemainObject: number[] = [];
   // 状态
   private status: number = 0;
 
@@ -106,6 +108,14 @@ export class CanvasVerbal {
     }
   }
 
+  public eventRender(obj: VerbalObject) {
+    if (!obj) {
+      return;
+    }
+    this.cleanAll(this.firstCtx!);
+    obj.lastRender(this.firstCtx!);
+  }
+
   public cleanAll(ctx: CanvasRenderingContext2D) {
     ctx.clearRect(0, 0, this.width, this.height);
   }
@@ -130,8 +140,8 @@ export class CanvasVerbal {
     mouseTop: number,
     canvasVerbal: CanvasVerbal
   ) => {
-    let run = canvasVerbal.objects.head?.next;
-    while (run) {
+    let run = canvasVerbal.objects.tail;
+    while (run && run !== canvasVerbal.objects.head) {
       const obj = run.val!;
       if (
         isInBoundingBox(
@@ -145,7 +155,7 @@ export class CanvasVerbal {
           return obj;
         }
       }
-      run = run.next;
+      run = run.front;
     }
     return null;
   };
@@ -160,21 +170,21 @@ export class CanvasVerbal {
   private static mouseMove = (event: any, canvasVerbal: CanvasVerbal) => {
     const mouseLeft = event.offsetX;
     const mouseTop = event.offsetY;
-
+    const obj = CanvasVerbal.judgeMouseInObject(
+      mouseLeft,
+      mouseTop,
+      canvasVerbal
+    );
     switch (canvasVerbal.status) {
       case CanvasVerbalStatusType.NONE:
-        const obj = CanvasVerbal.judgeMouseInObject(
-          mouseLeft,
-          mouseTop,
-          canvasVerbal
-        );
         if (obj) {
+          // 高亮矩形
           canvasVerbal.cleanAll(canvasVerbal.firstCtx!);
           PitchOnBox.render(
-            obj.left - 1,
-            obj.top - 1,
-            obj.left + obj.width + 1,
-            obj.top + obj.height + 1,
+            obj.sumLeft - 1,
+            obj.sumTop - 1,
+            obj.sumLeft + obj.sumWidth + 1,
+            obj.sumTop + obj.sumHeight + 1,
             canvasVerbal.firstCtx!
           );
         } else {
@@ -192,13 +202,41 @@ export class CanvasVerbal {
           canvasVerbal.firstCtx!
         );
         break;
+
+      case CanvasVerbalStatusType.PITCH_ON:
+        // 拖拽
+        if (canvasVerbal.activeObject) {
+          const newLeft = mouseLeft - canvasVerbal.activeMouseRemainObject[0];
+          const newTop = mouseTop - canvasVerbal.activeMouseRemainObject[1];
+          canvasVerbal.activeObject.changePosition(newLeft, newTop);
+          canvasVerbal.eventRender(canvasVerbal.activeObject);
+        }
+        break;
     }
   };
   // 鼠标按下事件
   private static mouseDown = (event: any, canvasVerbal: CanvasVerbal) => {
     const mouseLeft = event.offsetX;
     const mouseTop = event.offsetY;
-    if (CanvasVerbal.judgeMouseInObject(mouseLeft, mouseTop, canvasVerbal)) {
+    const obj = CanvasVerbal.judgeMouseInObject(
+      mouseLeft,
+      mouseTop,
+      canvasVerbal
+    );
+    if (obj) {
+      canvasVerbal.status = CanvasVerbalStatusType.PITCH_ON;
+      canvasVerbal.cleanAll(canvasVerbal.firstCtx!);
+      obj.isPitchOn = true;
+      obj.isShow = false;
+      canvasVerbal.activeObject = obj;
+      canvasVerbal.render();
+      obj.isPitchOn = true;
+      obj.isShow = true;
+      canvasVerbal.eventRender(obj);
+      const remainX = mouseLeft - obj.left;
+      const remainY = mouseTop - obj.top;
+      canvasVerbal.activeMouseRemainObject[0] = remainX;
+      canvasVerbal.activeMouseRemainObject[1] = remainY;
     } else {
       canvasVerbal.status = CanvasVerbalStatusType.COMMON_MOUSE_DOWN;
       canvasVerbal.commonMouseDownPoint[0] = mouseLeft;
@@ -208,9 +246,26 @@ export class CanvasVerbal {
 
   // 鼠标放开事件
   private static mouseUp = (event: any, canvasVerbal: CanvasVerbal) => {
-    canvasVerbal.status = CanvasVerbalStatusType.NONE;
-    canvasVerbal.commonMouseDownPoint[0] = 0;
-    canvasVerbal.commonMouseDownPoint[1] = 0;
-    canvasVerbal.cleanAll(canvasVerbal.firstCtx!);
+    switch (canvasVerbal.status) {
+      case CanvasVerbalStatusType.NONE:
+        break;
+      case CanvasVerbalStatusType.COMMON_MOUSE_DOWN:
+        canvasVerbal.status = CanvasVerbalStatusType.NONE;
+        canvasVerbal.commonMouseDownPoint[0] = 0;
+        canvasVerbal.commonMouseDownPoint[1] = 0;
+        canvasVerbal.cleanAll(canvasVerbal.firstCtx!);
+        break;
+      case CanvasVerbalStatusType.PITCH_ON:
+        canvasVerbal.status = CanvasVerbalStatusType.NONE;
+        canvasVerbal.cleanAll(canvasVerbal.firstCtx!);
+        if (canvasVerbal.activeObject) {
+          canvasVerbal.activeObject.isShow = true;
+          canvasVerbal.activeObject.isPitchOn = false;
+          canvasVerbal.activeObject = null;
+          console.log("asdfasdf");
+        }
+        canvasVerbal.render();
+        break;
+    }
   };
 }

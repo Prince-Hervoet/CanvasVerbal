@@ -5,7 +5,7 @@ export enum BaseShapeType {
   CIRCLE = "circle",
 }
 
-export const BrushAttributeType = ["fill", "border", "border-size"];
+export const BrushAttributeType = ["fill", "border_color", "border_size"];
 
 export enum CanvasVerbalStatusType {
   NONE = 0,

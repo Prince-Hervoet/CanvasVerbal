@@ -24,7 +24,7 @@ export class ObjectList {
     node.val = object;
     this.tail!.next = node;
     node.front = this.tail;
-    this.tail = this.tail!.next;
+    this.tail = node;
     this.size += 1;
   }
 }
