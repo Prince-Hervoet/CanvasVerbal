@@ -40,12 +40,13 @@ export class VerbalObject {
         this.sumWidth = 0;
         this.sumHeight = 0;
         //* 包围盒位置
-        this.boundingBoxp1 = null;
-        this.boundingBoxp2 = null;
-        this.boundingBoxp3 = null;
-        this.boundingBoxp4 = null;
+        this.boundingBoxp1 = new Point(0, 0);
+        this.boundingBoxp2 = new Point(0, 0);
+        this.boundingBoxp3 = new Point(0, 0);
+        this.boundingBoxp4 = new Point(0, 0);
         // 边
-        this.edges = null;
+        this.edges = [];
+        this.boundingBoxEdges = [];
         // style
         this.styleInfo = { fill: "", border_size: 0, border_color: "" };
         // 放大缩小
@@ -76,9 +77,7 @@ export class VerbalObject {
         this.styleInfo = styleInfo;
         //* 计算加上描边的总大小
         this.calculatePosition(styleInfo);
-        //* 计算包围盒大小
-        this.boundingBoxp1 = new Point(this.sumLeft, this.sumTop);
-        this.boundingBoxp2 = new Point(this.sumLeft + this.sumWidth, this.sumTop + this.sumHeight);
+        this.setBoundingBox();
     }
     render(ctx) { }
     setEdges() { }
@@ -109,6 +108,22 @@ export class VerbalObject {
             }
         }
     }
+    setBoundingBox() {
+        //* 计算包围盒大小
+        this.boundingBoxp1 = new Point(this.sumLeft, this.sumTop);
+        this.boundingBoxp2 = new Point(this.sumLeft + this.sumWidth, this.sumTop);
+        this.boundingBoxp3 = new Point(this.sumLeft + this.sumWidth, this.sumTop + this.sumHeight);
+        this.boundingBoxp4 = new Point(this.sumLeft, this.sumTop + this.sumHeight);
+        const e1 = new Edge(this.boundingBoxp1, this.boundingBoxp2);
+        const e2 = new Edge(this.boundingBoxp2, this.boundingBoxp3);
+        const e3 = new Edge(this.boundingBoxp3, this.boundingBoxp4);
+        const e4 = new Edge(this.boundingBoxp4, this.boundingBoxp1);
+        this.boundingBoxEdges = [];
+        this.boundingBoxEdges.push(e1);
+        this.boundingBoxEdges.push(e2);
+        this.boundingBoxEdges.push(e3);
+        this.boundingBoxEdges.push(e4);
+    }
     //? 改变位置的重新计算函数
     changePosition(newLeft, newTop) {
         this.left = newLeft;
@@ -117,6 +132,7 @@ export class VerbalObject {
         this.boundingBoxp1 = new Point(this.sumLeft, this.sumTop);
         this.boundingBoxp2 = new Point(this.sumLeft + this.sumWidth, this.sumTop + this.sumHeight);
         this.setEdges();
+        this.setBoundingBox();
     }
     //? 计算描边
     calculatePosition(styleInfo) {

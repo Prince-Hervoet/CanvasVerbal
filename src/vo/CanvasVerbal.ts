@@ -1,10 +1,13 @@
+import { Edge } from "./../type/VerbalObject.js";
 import { ControlBox } from "./../type/ControlBox.js";
 import { Checkbox } from "./../type/Checkbox.js";
 import { Point, VerbalObject } from "../type/VerbalObject.js";
 import { ObjectList } from "../type/ObjectList.js";
 import {
+  anyCoordconver,
   CanvasVerbalStatusType,
   isInBoundingBox,
+  judgeBoxSelection,
   radiographic,
 } from "../util/common.js";
 import { PitchOnBox } from "../type/PitchOnBox.js";
@@ -157,14 +160,7 @@ export class CanvasVerbal {
     let run = canvasVerbal.objects.tail;
     while (run && run !== canvasVerbal.objects.head) {
       const obj = run.val!;
-      if (
-        isInBoundingBox(
-          mouseLeft,
-          mouseTop,
-          obj.boundingBoxp1!,
-          obj.boundingBoxp2!
-        )
-      ) {
+      if (isInBoundingBox(mouseLeft, mouseTop, obj.boundingBoxEdges)) {
         if (radiographic(mouseLeft, mouseTop, obj.edges!)) {
           return obj;
         }
@@ -174,19 +170,47 @@ export class CanvasVerbal {
     return null;
   };
 
-  //? 单击事件
-  private static singleClick = (event: any, canvasVerbal: CanvasVerbal) => {
-    // const mouseLeft = event.clientX;
-    // const mouseTop = event.clientY;
-    // const obj = CanvasVerbal.judgeMouseInObject(
-    //   mouseLeft,
-    //   mouseTop,
-    //   canvasVerbal
-    // );
-    // if (obj) {
-    //   ControlBox.render(100, 100, 100, 100, 0, canvasVerbal.firstCtx!);
-    // }
+  private static judgeSelection = (box: Edge[], canvasVerbal: CanvasVerbal) => {
+    let run = canvasVerbal.objects.tail;
+    let isOk = false;
+    let minLeft = 9999999999;
+    let minTop = 9999999999;
+    let maxLeft = -1;
+    let maxTop = -1;
+    while (run && run !== canvasVerbal.objects.head) {
+      const obj = run.val!;
+      if (judgeBoxSelection(box, obj.boundingBoxEdges)) {
+        isOk = true;
+        minLeft = Math.min(minLeft, obj.boundingBoxp1.left);
+        minLeft = Math.min(minLeft, obj.boundingBoxp2.left);
+        minLeft = Math.min(minLeft, obj.boundingBoxp3.left);
+        minLeft = Math.min(minLeft, obj.boundingBoxp4.left);
+
+        minTop = Math.min(minTop, obj.boundingBoxp1.top);
+        minTop = Math.min(minTop, obj.boundingBoxp2.top);
+        minTop = Math.min(minTop, obj.boundingBoxp3.top);
+        minTop = Math.min(minTop, obj.boundingBoxp4.top);
+
+        maxLeft = Math.max(maxLeft, obj.boundingBoxp1.left);
+        maxLeft = Math.max(maxLeft, obj.boundingBoxp2.left);
+        maxLeft = Math.max(maxLeft, obj.boundingBoxp3.left);
+        maxLeft = Math.max(maxLeft, obj.boundingBoxp4.left);
+
+        maxTop = Math.max(maxTop, obj.boundingBoxp1.top);
+        maxTop = Math.max(maxTop, obj.boundingBoxp2.top);
+        maxTop = Math.max(maxTop, obj.boundingBoxp3.top);
+        maxTop = Math.max(maxTop, obj.boundingBoxp4.top);
+      }
+      run = run.front;
+    }
+    if (isOk) {
+      return [minLeft, minTop, maxLeft, maxTop];
+    }
+    return [-1, -1, -1, -1];
   };
+
+  //? 单击事件
+  private static singleClick = (event: any, canvasVerbal: CanvasVerbal) => {};
 
   //? 鼠标移动事件
   private static mouseMove = (event: any, canvasVerbal: CanvasVerbal) => {
@@ -279,11 +303,35 @@ export class CanvasVerbal {
 
   // 鼠标放开事件
   private static mouseUp = (event: any, canvasVerbal: CanvasVerbal) => {
+    const mouseLeft = event.offsetX;
+    const mouseTop = event.offsetY;
     switch (canvasVerbal.status) {
       case CanvasVerbalStatusType.NONE:
         break;
       case CanvasVerbalStatusType.COMMON_MOUSE_DOWN:
         canvasVerbal.status = CanvasVerbalStatusType.NONE;
+        const [left0, top0, width0, height0] = anyCoordconver(
+          mouseLeft,
+          mouseTop,
+          canvasVerbal.commonMouseDownPoint[0],
+          canvasVerbal.commonMouseDownPoint[1]
+        );
+        const p1 = new Point(left0, top0);
+        const p2 = new Point(left0 + width0, top0);
+        const p3 = new Point(left0 + width0, top0 + height0);
+        const p4 = new Point(left0, top0 + height0);
+        const e1 = new Edge(p1, p2);
+        const e2 = new Edge(p2, p3);
+        const e3 = new Edge(p3, p4);
+        const e4 = new Edge(p4, p1);
+        const edges = [];
+        edges.push(e1);
+        edges.push(e2);
+        edges.push(e3);
+        edges.push(e4);
+
+        CanvasVerbal.judgeSelection(edges, canvasVerbal);
+
         canvasVerbal.commonMouseDownPoint[0] = 0;
         canvasVerbal.commonMouseDownPoint[1] = 0;
         canvasVerbal.cleanAll(canvasVerbal.firstCtx!);

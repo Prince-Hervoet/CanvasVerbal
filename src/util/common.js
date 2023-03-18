@@ -44,61 +44,40 @@ export function radiographic(left, top, edges) {
     return false;
 }
 //? 判断是否在包围盒内
-export function isInBoundingBox(left, top, p1, p2) {
-    if (left > p1.left && left > p2.left) {
-        return false;
-    }
-    else if (top > p1.top && top > p2.top) {
-        return false;
-    }
-    else if (left < p1.left && left < p2.left) {
-        return false;
-    }
-    else if (top < p1.top && top < p2.top) {
-        return false;
-    }
-    return true;
+export function isInBoundingBox(left, top, edges) {
+    return radiographic(left, top, edges);
 }
 //? 将角度转成弧度
 export function degreesToAngle(degrees) {
     return degrees * DEGREES_TO_ADGLE;
 }
+export function anyCoordconver(startX, startY, endX, endY) {
+    let biggerX = startX >= endX ? startX : endX;
+    let biggerY = startY >= endY ? startY : endY;
+    let smallerX = startX <= endX ? startX : endX;
+    let smallerY = startY <= endY ? startY : endY;
+    const remainX = biggerX - smallerX;
+    const remainY = biggerY - smallerY;
+    const topLeftCornerX = biggerX - remainX;
+    const topLeftCornerY = smallerY;
+    return [topLeftCornerX, topLeftCornerY, remainX, remainY];
+}
+//? 判断盒子相交
 export function judgeBoxSelection(boxEdges, targetEdges) {
-    let inCount = 0;
-    let minTop = 999999999, minLeft = 999999999;
-    let maxTop = 0, maxLeft = 0;
     for (const be of boxEdges) {
         const p1 = be.p1;
         const p2 = be.p2;
-        minTop = minTop < p1.top ? minTop : p1.top;
-        maxTop = maxTop > p1.top ? maxTop : p1.top;
-        minLeft = minLeft < p1.left ? minLeft : p1.left;
-        maxLeft = maxLeft > p1.left ? maxLeft : p1.left;
-        for (const te of targetEdges) {
-            const p11 = te.p1;
-            const p22 = te.p2;
-            if (p1.top === p2.top) {
-                if (p11.top < p1.top && p22.top < p1.top) {
-                    continue;
-                }
-                else if (p11.top > p1.top && p22.top > p1.top) {
-                    continue;
-                }
-                else {
-                    return true;
-                }
-            }
-            else if (p1.left === p2.left) {
-                if (p11.left < p1.left && p22.left < p1.left) {
-                    continue;
-                }
-                else if (p11.left > p1.left && p22.left > p1.left) {
-                    continue;
-                }
-                else {
-                    return true;
-                }
-            }
+        if (radiographic(p1.left, p1.top, targetEdges) ||
+            radiographic(p2.left, p2.top, targetEdges)) {
+            return true;
+        }
+    }
+    for (const te of targetEdges) {
+        const p1 = te.p1;
+        const p2 = te.p2;
+        if (radiographic(p1.left, p1.top, boxEdges) ||
+            radiographic(p2.left, p2.top, boxEdges)) {
+            return true;
         }
     }
     return false;
