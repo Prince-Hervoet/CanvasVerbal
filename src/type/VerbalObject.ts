@@ -55,6 +55,8 @@ export class VerbalObject {
   //* 包围盒位置
   public boundingBoxp1: Point | null = null;
   public boundingBoxp2: Point | null = null;
+  public boundingBoxp3: Point | null = null;
+  public boundingBoxp4: Point | null = null;
 
   // 边
   public edges: Edge[] | null = null;

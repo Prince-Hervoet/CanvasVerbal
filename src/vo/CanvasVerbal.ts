@@ -1,3 +1,4 @@
+import { ControlBox } from "./../type/ControlBox.js";
 import { Checkbox } from "./../type/Checkbox.js";
 import { Point, VerbalObject } from "../type/VerbalObject.js";
 import { ObjectList } from "../type/ObjectList.js";
@@ -175,8 +176,16 @@ export class CanvasVerbal {
 
   //? 单击事件
   private static singleClick = (event: any, canvasVerbal: CanvasVerbal) => {
-    const mouseLeft = event.clientX;
-    const mouseTop = event.clientY;
+    // const mouseLeft = event.clientX;
+    // const mouseTop = event.clientY;
+    // const obj = CanvasVerbal.judgeMouseInObject(
+    //   mouseLeft,
+    //   mouseTop,
+    //   canvasVerbal
+    // );
+    // if (obj) {
+    //   ControlBox.render(100, 100, 100, 100, 0, canvasVerbal.firstCtx!);
+    // }
   };
 
   //? 鼠标移动事件
@@ -198,6 +207,7 @@ export class CanvasVerbal {
             obj.sumTop - 1,
             obj.sumLeft + obj.sumWidth + 1,
             obj.sumTop + obj.sumHeight + 1,
+            obj.rotation,
             canvasVerbal.firstCtx!
           );
         } else {
@@ -219,6 +229,15 @@ export class CanvasVerbal {
       case CanvasVerbalStatusType.PITCH_ON:
         // 拖拽
         if (canvasVerbal.activeObject) {
+          canvasVerbal.status = CanvasVerbalStatusType.DRAGING;
+          const newLeft = mouseLeft - canvasVerbal.activeMouseRemainObject[0];
+          const newTop = mouseTop - canvasVerbal.activeMouseRemainObject[1];
+          canvasVerbal.activeObject.changePosition(newLeft, newTop);
+          canvasVerbal.eventRender(canvasVerbal.activeObject);
+        }
+        break;
+      case CanvasVerbalStatusType.DRAGING:
+        if (canvasVerbal.activeObject) {
           const newLeft = mouseLeft - canvasVerbal.activeMouseRemainObject[0];
           const newTop = mouseTop - canvasVerbal.activeMouseRemainObject[1];
           canvasVerbal.activeObject.changePosition(newLeft, newTop);
@@ -236,6 +255,7 @@ export class CanvasVerbal {
       mouseTop,
       canvasVerbal
     );
+    //* 如果在物体上，则为选中状态
     if (obj) {
       canvasVerbal.status = CanvasVerbalStatusType.PITCH_ON;
       canvasVerbal.cleanAll(canvasVerbal.firstCtx!);
@@ -267,17 +287,53 @@ export class CanvasVerbal {
         canvasVerbal.commonMouseDownPoint[0] = 0;
         canvasVerbal.commonMouseDownPoint[1] = 0;
         canvasVerbal.cleanAll(canvasVerbal.firstCtx!);
+        canvasVerbal.activeObject = null;
         break;
       case CanvasVerbalStatusType.PITCH_ON:
-        canvasVerbal.status = CanvasVerbalStatusType.NONE;
+        canvasVerbal.status = CanvasVerbalStatusType.CONTROL;
         canvasVerbal.cleanAll(canvasVerbal.firstCtx!);
-        if (canvasVerbal.activeObject) {
-          canvasVerbal.activeObject.isShow = true;
-          canvasVerbal.activeObject.isPitchOn = false;
-          canvasVerbal.activeObject = null;
-          console.log("asdfasdf");
+        if (!canvasVerbal.activeObject) {
+          break;
         }
+        canvasVerbal.activeObject.isShow = true;
+        canvasVerbal.activeObject.isPitchOn = true;
+        const left1 = canvasVerbal.activeObject.sumLeft;
+        const top1 = canvasVerbal.activeObject.sumTop;
+        const width1 = canvasVerbal.activeObject.sumWidth;
+        const height1 = canvasVerbal.activeObject.sumHeight;
+        ControlBox.render(
+          left1,
+          top1,
+          width1,
+          height1,
+          canvasVerbal.activeObject.rotation,
+          canvasVerbal.firstCtx!
+        );
         canvasVerbal.render();
+        break;
+
+      case CanvasVerbalStatusType.DRAGING:
+        canvasVerbal.status = CanvasVerbalStatusType.CONTROL;
+        if (!canvasVerbal.activeObject) {
+          break;
+        }
+        canvasVerbal.cleanAll(canvasVerbal.firstCtx!);
+        canvasVerbal.activeObject.isShow = true;
+        canvasVerbal.render();
+        canvasVerbal.activeObject.isShow = true;
+        canvasVerbal.activeObject.isPitchOn = true;
+        const left2 = canvasVerbal.activeObject.sumLeft;
+        const top2 = canvasVerbal.activeObject.sumTop;
+        const width2 = canvasVerbal.activeObject.sumWidth;
+        const height2 = canvasVerbal.activeObject.sumHeight;
+        ControlBox.render(
+          left2,
+          top2,
+          width2,
+          height2,
+          canvasVerbal.activeObject.rotation,
+          canvasVerbal.firstCtx!
+        );
         break;
     }
   };

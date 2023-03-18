@@ -5,6 +5,7 @@ export class PitchOnBox {
     startY: number,
     endX: number,
     endY: number,
+    angle: number,
     ctx: CanvasRenderingContext2D
   ) {
     let biggerX = startX >= endX ? startX : endX;
@@ -18,6 +19,7 @@ export class PitchOnBox {
     ctx.beginPath();
     ctx.fillStyle = "rgb(255,255,255,0.4)";
     ctx.rect(topLeftCornerX, topLeftCornerY, remainX, remainY);
+    ctx.rotate(angle);
     ctx.fill();
     ctx.closePath();
   }

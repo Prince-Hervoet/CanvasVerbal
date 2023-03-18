@@ -1,3 +1,4 @@
+const DEGREES_TO_ADGLE = Math.PI / 180;
 //* 基础类型名称
 export var BaseShapeType;
 (function (BaseShapeType) {
@@ -16,6 +17,8 @@ export var CanvasVerbalStatusType;
     CanvasVerbalStatusType[CanvasVerbalStatusType["DRAGING"] = 2] = "DRAGING";
     // 普通按下
     CanvasVerbalStatusType[CanvasVerbalStatusType["COMMON_MOUSE_DOWN"] = 3] = "COMMON_MOUSE_DOWN";
+    // 控制
+    CanvasVerbalStatusType[CanvasVerbalStatusType["CONTROL"] = 4] = "CONTROL";
 })(CanvasVerbalStatusType || (CanvasVerbalStatusType = {}));
 //? 射线检测，检测鼠标是否在一个几何图形内部
 export function radiographic(left, top, edges) {
@@ -55,4 +58,48 @@ export function isInBoundingBox(left, top, p1, p2) {
         return false;
     }
     return true;
+}
+//? 将角度转成弧度
+export function degreesToAngle(degrees) {
+    return degrees * DEGREES_TO_ADGLE;
+}
+export function judgeBoxSelection(boxEdges, targetEdges) {
+    let inCount = 0;
+    let minTop = 999999999, minLeft = 999999999;
+    let maxTop = 0, maxLeft = 0;
+    for (const be of boxEdges) {
+        const p1 = be.p1;
+        const p2 = be.p2;
+        minTop = minTop < p1.top ? minTop : p1.top;
+        maxTop = maxTop > p1.top ? maxTop : p1.top;
+        minLeft = minLeft < p1.left ? minLeft : p1.left;
+        maxLeft = maxLeft > p1.left ? maxLeft : p1.left;
+        for (const te of targetEdges) {
+            const p11 = te.p1;
+            const p22 = te.p2;
+            if (p1.top === p2.top) {
+                if (p11.top < p1.top && p22.top < p1.top) {
+                    continue;
+                }
+                else if (p11.top > p1.top && p22.top > p1.top) {
+                    continue;
+                }
+                else {
+                    return true;
+                }
+            }
+            else if (p1.left === p2.left) {
+                if (p11.left < p1.left && p22.left < p1.left) {
+                    continue;
+                }
+                else if (p11.left > p1.left && p22.left > p1.left) {
+                    continue;
+                }
+                else {
+                    return true;
+                }
+            }
+        }
+    }
+    return false;
 }

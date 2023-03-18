@@ -42,6 +42,8 @@ export class VerbalObject {
         //* 包围盒位置
         this.boundingBoxp1 = null;
         this.boundingBoxp2 = null;
+        this.boundingBoxp3 = null;
+        this.boundingBoxp4 = null;
         // 边
         this.edges = null;
         // style

@@ -1,5 +1,7 @@
 import { Edge, Point } from "./../type/VerbalObject";
 
+const DEGREES_TO_ADGLE = Math.PI / 180;
+
 //* 基础类型名称
 export enum BaseShapeType {
   RECT = "rect",
@@ -18,6 +20,8 @@ export enum CanvasVerbalStatusType {
   DRAGING = 2,
   // 普通按下
   COMMON_MOUSE_DOWN = 3,
+  // 控制
+  CONTROL = 4,
 }
 
 //? 射线检测，检测鼠标是否在一个几何图形内部
@@ -63,4 +67,45 @@ export function isInBoundingBox(
   return true;
 }
 
-export function isCloseToEdges(aEdges: Edge[], bEdges: Edge[]) {}
+//? 将角度转成弧度
+export function degreesToAngle(degrees: number) {
+  return degrees * DEGREES_TO_ADGLE;
+}
+
+export function judgeBoxSelection(boxEdges: Edge[], targetEdges: Edge[]) {
+  let inCount = 0;
+  let minTop = 999999999,
+    minLeft = 999999999;
+  let maxTop = 0,
+    maxLeft = 0;
+  for (const be of boxEdges) {
+    const p1 = be.p1!;
+    const p2 = be.p2!;
+    minTop = minTop < p1.top ? minTop : p1.top;
+    maxTop = maxTop > p1.top ? maxTop : p1.top;
+    minLeft = minLeft < p1.left ? minLeft : p1.left;
+    maxLeft = maxLeft > p1.left ? maxLeft : p1.left;
+    for (const te of targetEdges) {
+      const p11 = te.p1!;
+      const p22 = te.p2!;
+      if (p1.top === p2.top) {
+        if (p11.top < p1.top && p22.top < p1.top) {
+          continue;
+        } else if (p11.top > p1.top && p22.top > p1.top) {
+          continue;
+        } else {
+          return true;
+        }
+      } else if (p1.left === p2.left) {
+        if (p11.left < p1.left && p22.left < p1.left) {
+          continue;
+        } else if (p11.left > p1.left && p22.left > p1.left) {
+          continue;
+        } else {
+          return true;
+        }
+      }
+    }
+  }
+  return false;
+}

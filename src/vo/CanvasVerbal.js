@@ -1,3 +1,4 @@
+import { ControlBox } from "./../type/ControlBox.js";
 import { Checkbox } from "./../type/Checkbox.js";
 import { ObjectList } from "../type/ObjectList.js";
 import { CanvasVerbalStatusType, isInBoundingBox, radiographic, } from "../util/common.js";
@@ -47,7 +48,7 @@ export class CanvasVerbal {
         this.secondCtx = null;
         // 元素列表
         this.objects = new ObjectList();
-        // 当前选中的物体
+        // 当前选中  的物体
         this.activeObject = null;
         // 鼠标点击拖拽时，鼠标和物体左上角坐标的差值
         this.activeMouseRemainObject = [];
@@ -130,8 +131,16 @@ CanvasVerbal.judgeMouseInObject = (mouseLeft, mouseTop, canvasVerbal) => {
 };
 //? 单击事件
 CanvasVerbal.singleClick = (event, canvasVerbal) => {
-    const mouseLeft = event.clientX;
-    const mouseTop = event.clientY;
+    // const mouseLeft = event.clientX;
+    // const mouseTop = event.clientY;
+    // const obj = CanvasVerbal.judgeMouseInObject(
+    //   mouseLeft,
+    //   mouseTop,
+    //   canvasVerbal
+    // );
+    // if (obj) {
+    //   ControlBox.render(100, 100, 100, 100, 0, canvasVerbal.firstCtx!);
+    // }
 };
 //? 鼠标移动事件
 CanvasVerbal.mouseMove = (event, canvasVerbal) => {
@@ -143,7 +152,7 @@ CanvasVerbal.mouseMove = (event, canvasVerbal) => {
             if (obj) {
                 // 高亮矩形
                 canvasVerbal.cleanAll(canvasVerbal.firstCtx);
-                PitchOnBox.render(obj.sumLeft - 1, obj.sumTop - 1, obj.sumLeft + obj.sumWidth + 1, obj.sumTop + obj.sumHeight + 1, canvasVerbal.firstCtx);
+                PitchOnBox.render(obj.sumLeft - 1, obj.sumTop - 1, obj.sumLeft + obj.sumWidth + 1, obj.sumTop + obj.sumHeight + 1, obj.rotation, canvasVerbal.firstCtx);
             }
             else {
                 canvasVerbal.cleanAll(canvasVerbal.firstCtx);
@@ -156,6 +165,15 @@ CanvasVerbal.mouseMove = (event, canvasVerbal) => {
             break;
         case CanvasVerbalStatusType.PITCH_ON:
             // 拖拽
+            if (canvasVerbal.activeObject) {
+                canvasVerbal.status = CanvasVerbalStatusType.DRAGING;
+                const newLeft = mouseLeft - canvasVerbal.activeMouseRemainObject[0];
+                const newTop = mouseTop - canvasVerbal.activeMouseRemainObject[1];
+                canvasVerbal.activeObject.changePosition(newLeft, newTop);
+                canvasVerbal.eventRender(canvasVerbal.activeObject);
+            }
+            break;
+        case CanvasVerbalStatusType.DRAGING:
             if (canvasVerbal.activeObject) {
                 const newLeft = mouseLeft - canvasVerbal.activeMouseRemainObject[0];
                 const newTop = mouseTop - canvasVerbal.activeMouseRemainObject[1];
@@ -170,6 +188,7 @@ CanvasVerbal.mouseDown = (event, canvasVerbal) => {
     const mouseLeft = event.offsetX;
     const mouseTop = event.offsetY;
     const obj = CanvasVerbal.judgeMouseInObject(mouseLeft, mouseTop, canvasVerbal);
+    //* 如果在物体上，则为选中状态
     if (obj) {
         canvasVerbal.status = CanvasVerbalStatusType.PITCH_ON;
         canvasVerbal.cleanAll(canvasVerbal.firstCtx);
@@ -201,17 +220,38 @@ CanvasVerbal.mouseUp = (event, canvasVerbal) => {
             canvasVerbal.commonMouseDownPoint[0] = 0;
             canvasVerbal.commonMouseDownPoint[1] = 0;
             canvasVerbal.cleanAll(canvasVerbal.firstCtx);
+            canvasVerbal.activeObject = null;
             break;
         case CanvasVerbalStatusType.PITCH_ON:
-            canvasVerbal.status = CanvasVerbalStatusType.NONE;
+            canvasVerbal.status = CanvasVerbalStatusType.CONTROL;
             canvasVerbal.cleanAll(canvasVerbal.firstCtx);
-            if (canvasVerbal.activeObject) {
-                canvasVerbal.activeObject.isShow = true;
-                canvasVerbal.activeObject.isPitchOn = false;
-                canvasVerbal.activeObject = null;
-                console.log("asdfasdf");
+            if (!canvasVerbal.activeObject) {
+                break;
             }
+            canvasVerbal.activeObject.isShow = true;
+            canvasVerbal.activeObject.isPitchOn = true;
+            const left1 = canvasVerbal.activeObject.sumLeft;
+            const top1 = canvasVerbal.activeObject.sumTop;
+            const width1 = canvasVerbal.activeObject.sumWidth;
+            const height1 = canvasVerbal.activeObject.sumHeight;
+            ControlBox.render(left1, top1, width1, height1, canvasVerbal.activeObject.rotation, canvasVerbal.firstCtx);
             canvasVerbal.render();
+            break;
+        case CanvasVerbalStatusType.DRAGING:
+            canvasVerbal.status = CanvasVerbalStatusType.CONTROL;
+            if (!canvasVerbal.activeObject) {
+                break;
+            }
+            canvasVerbal.cleanAll(canvasVerbal.firstCtx);
+            canvasVerbal.activeObject.isShow = true;
+            canvasVerbal.render();
+            canvasVerbal.activeObject.isShow = true;
+            canvasVerbal.activeObject.isPitchOn = true;
+            const left2 = canvasVerbal.activeObject.sumLeft;
+            const top2 = canvasVerbal.activeObject.sumTop;
+            const width2 = canvasVerbal.activeObject.sumWidth;
+            const height2 = canvasVerbal.activeObject.sumHeight;
+            ControlBox.render(left2, top2, width2, height2, canvasVerbal.activeObject.rotation, canvasVerbal.firstCtx);
             break;
     }
 };
