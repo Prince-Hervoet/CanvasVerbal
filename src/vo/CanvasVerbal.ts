@@ -59,13 +59,13 @@ export class CanvasVerbal {
   private id: string;
   private width: number;
   private height: number;
-  //! 第一层画布 用于处理鼠标事件
+  //* 第一层画布 用于处理鼠标事件
   private firstCanvas: HTMLCanvasElement | null = null;
-  //! 第二层画布 用于渲染最后的结果
+  //* 第二层画布 用于渲染最后的结果
   private secondCanvas: HTMLCanvasElement | null = null;
   // 缓冲
   private bufferCanvas: HTMLCanvasElement | null = null;
-  //! 父级元素 包装两层画布的父
+  //* 父级元素 包装两层画布的父
   private boundingDiv: HTMLElement | null = null;
   // 第一层ctx
   private firstCtx: CanvasRenderingContext2D | null = null;
@@ -283,11 +283,9 @@ export class CanvasVerbal {
     if (obj) {
       canvasVerbal.status = CanvasVerbalStatusType.PITCH_ON;
       canvasVerbal.cleanAll(canvasVerbal.firstCtx!);
-      obj.isPitchOn = true;
       obj.isShow = false;
       canvasVerbal.activeObject = obj;
       canvasVerbal.render();
-      obj.isPitchOn = true;
       obj.isShow = true;
       canvasVerbal.eventRender(obj);
       const remainX = mouseLeft - obj.left;
@@ -301,7 +299,7 @@ export class CanvasVerbal {
     }
   };
 
-  // 鼠标放开事件
+  //? 鼠标放开事件
   private static mouseUp = (event: any, canvasVerbal: CanvasVerbal) => {
     const mouseLeft = event.offsetX;
     const mouseTop = event.offsetY;
@@ -344,7 +342,6 @@ export class CanvasVerbal {
           break;
         }
         canvasVerbal.activeObject.isShow = true;
-        canvasVerbal.activeObject.isPitchOn = true;
         const left1 = canvasVerbal.activeObject.sumLeft;
         const top1 = canvasVerbal.activeObject.sumTop;
         const width1 = canvasVerbal.activeObject.sumWidth;
@@ -361,15 +358,18 @@ export class CanvasVerbal {
         break;
 
       case CanvasVerbalStatusType.DRAGING:
+        //* 如果是从拖拽状态放开的情况，则修改状态为控制
         canvasVerbal.status = CanvasVerbalStatusType.CONTROL;
+        //* 健壮性
         if (!canvasVerbal.activeObject) {
           break;
         }
+        //* 清除事件画布
         canvasVerbal.cleanAll(canvasVerbal.firstCtx!);
+        //* 渲染到第二层画布上
         canvasVerbal.activeObject.isShow = true;
         canvasVerbal.render();
-        canvasVerbal.activeObject.isShow = true;
-        canvasVerbal.activeObject.isPitchOn = true;
+        //* 显示控制框
         const left2 = canvasVerbal.activeObject.sumLeft;
         const top2 = canvasVerbal.activeObject.sumTop;
         const width2 = canvasVerbal.activeObject.sumWidth;

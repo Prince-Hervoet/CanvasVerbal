@@ -76,8 +76,6 @@ export class VerbalObject {
   public shapeName: string = "object";
   // id
   public objectId: string = "default";
-  // 是否被选中
-  public isPitchOn: boolean = false;
   // 是否可视
   public isShow: boolean = true;
 
