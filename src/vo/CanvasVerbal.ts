@@ -1,3 +1,4 @@
+import { Group } from "./../type/Group";
 import { Edge } from "./../type/VerbalObject.js";
 import { ControlBox } from "./../type/ControlBox.js";
 import { Checkbox } from "./../type/Checkbox.js";
@@ -177,9 +178,12 @@ export class CanvasVerbal {
     let minTop = 9999999999;
     let maxLeft = -1;
     let maxTop = -1;
+    const groupArr = [];
     while (run && run !== canvasVerbal.objects.head) {
       const obj = run.val!;
       if (judgeBoxSelection(box, obj.boundingBoxEdges)) {
+        groupArr.push(obj);
+        console.log("香蕉了");
         isOk = true;
         minLeft = Math.min(minLeft, obj.boundingBoxp1.left);
         minLeft = Math.min(minLeft, obj.boundingBoxp2.left);
@@ -204,6 +208,14 @@ export class CanvasVerbal {
       run = run.front;
     }
     if (isOk) {
+      if (groupArr.length === 1) {
+        return [
+          groupArr[0].boundingBoxp1.left,
+          groupArr[0].boundingBoxp1.top,
+          groupArr[0].boundingBoxp3.left,
+          groupArr[0].boundingBoxp3.top,
+        ];
+      }
       return [minLeft, minTop, maxLeft, maxTop];
     }
     return [-1, -1, -1, -1];
@@ -225,6 +237,7 @@ export class CanvasVerbal {
       case CanvasVerbalStatusType.NONE:
         if (obj) {
           // 高亮矩形
+          canvasVerbal.status = CanvasVerbalStatusType.LIGHT;
           canvasVerbal.cleanAll(canvasVerbal.firstCtx!);
           PitchOnBox.render(
             obj.sumLeft - 1,
@@ -234,8 +247,12 @@ export class CanvasVerbal {
             obj.rotation,
             canvasVerbal.firstCtx!
           );
-        } else {
+        }
+        break;
+      case CanvasVerbalStatusType.LIGHT:
+        if (!obj) {
           canvasVerbal.cleanAll(canvasVerbal.firstCtx!);
+          canvasVerbal.status = CanvasVerbalStatusType.NONE;
         }
         break;
       case CanvasVerbalStatusType.COMMON_MOUSE_DOWN:
@@ -328,12 +345,23 @@ export class CanvasVerbal {
         edges.push(e3);
         edges.push(e4);
 
-        CanvasVerbal.judgeSelection(edges, canvasVerbal);
+        const ans = CanvasVerbal.judgeSelection(edges, canvasVerbal);
 
         canvasVerbal.commonMouseDownPoint[0] = 0;
         canvasVerbal.commonMouseDownPoint[1] = 0;
         canvasVerbal.cleanAll(canvasVerbal.firstCtx!);
         canvasVerbal.activeObject = null;
+        if (ans[0] !== -1 && ans[1] !== -1) {
+          console.log("画一下: " + ans[2] + " " + ans[3]);
+          ControlBox.render(
+            ans[0],
+            ans[1],
+            ans[2] - ans[0],
+            ans[3] - ans[1],
+            0,
+            canvasVerbal.firstCtx!
+          );
+        }
         break;
       case CanvasVerbalStatusType.PITCH_ON:
         canvasVerbal.status = CanvasVerbalStatusType.CONTROL;
@@ -374,6 +402,8 @@ export class CanvasVerbal {
         const top2 = canvasVerbal.activeObject.sumTop;
         const width2 = canvasVerbal.activeObject.sumWidth;
         const height2 = canvasVerbal.activeObject.sumHeight;
+        console.log("当前位置: " + left2 + " " + top2);
+
         ControlBox.render(
           left2,
           top2,

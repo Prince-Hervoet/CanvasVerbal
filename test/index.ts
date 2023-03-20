@@ -13,6 +13,11 @@ const test2 = new Rect(
   { width: 100, height: 100, left: 300, top: 20 },
   { fill: "blue", border_size: 10, border_color: "green" }
 );
+
+const test3 = new Rect(
+  { width: 100, height: 100, left: 500, top: 20 },
+  { fill: "blue", border_size: 10, border_color: "green" }
+);
 cv.addObject(test1);
-cv.addObject(test2);
+cv.addObject(test2).addObject(test3);
 cv.render();

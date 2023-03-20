@@ -22,6 +22,8 @@ export enum CanvasVerbalStatusType {
   COMMON_MOUSE_DOWN = 3,
   // 控制
   CONTROL = 4,
+  // 高亮
+  LIGHT = 5,
 }
 
 //? 射线检测，检测鼠标是否在一个几何图形内部

@@ -36,13 +36,13 @@ export function canvasVerbal(id, width, height, styleInfo, parent) {
 // 画布主类，包含canvasDOM、上下文、状态机等
 export class CanvasVerbal {
     constructor(id, fitstCanvasDom, secondCanvasDom, boundingDiv) {
-        //! 第一层画布 用于处理鼠标事件
+        //* 第一层画布 用于处理鼠标事件
         this.firstCanvas = null;
-        //! 第二层画布 用于渲染最后的结果
+        //* 第二层画布 用于渲染最后的结果
         this.secondCanvas = null;
         // 缓冲
         this.bufferCanvas = null;
-        //! 父级元素 包装两层画布的父
+        //* 父级元素 包装两层画布的父
         this.boundingDiv = null;
         // 第一层ctx
         this.firstCtx = null;
@@ -138,9 +138,12 @@ CanvasVerbal.judgeSelection = (box, canvasVerbal) => {
     let minTop = 9999999999;
     let maxLeft = -1;
     let maxTop = -1;
+    const groupArr = [];
     while (run && run !== canvasVerbal.objects.head) {
         const obj = run.val;
         if (judgeBoxSelection(box, obj.boundingBoxEdges)) {
+            groupArr.push(obj);
+            console.log("香蕉了");
             isOk = true;
             minLeft = Math.min(minLeft, obj.boundingBoxp1.left);
             minLeft = Math.min(minLeft, obj.boundingBoxp2.left);
@@ -162,6 +165,14 @@ CanvasVerbal.judgeSelection = (box, canvasVerbal) => {
         run = run.front;
     }
     if (isOk) {
+        if (groupArr.length === 1) {
+            return [
+                groupArr[0].boundingBoxp1.left,
+                groupArr[0].boundingBoxp1.top,
+                groupArr[0].boundingBoxp3.left,
+                groupArr[0].boundingBoxp3.top,
+            ];
+        }
         return [minLeft, minTop, maxLeft, maxTop];
     }
     return [-1, -1, -1, -1];
@@ -177,11 +188,15 @@ CanvasVerbal.mouseMove = (event, canvasVerbal) => {
         case CanvasVerbalStatusType.NONE:
             if (obj) {
                 // 高亮矩形
+                canvasVerbal.status = CanvasVerbalStatusType.LIGHT;
                 canvasVerbal.cleanAll(canvasVerbal.firstCtx);
                 PitchOnBox.render(obj.sumLeft - 1, obj.sumTop - 1, obj.sumLeft + obj.sumWidth + 1, obj.sumTop + obj.sumHeight + 1, obj.rotation, canvasVerbal.firstCtx);
             }
-            else {
+            break;
+        case CanvasVerbalStatusType.LIGHT:
+            if (!obj) {
                 canvasVerbal.cleanAll(canvasVerbal.firstCtx);
+                canvasVerbal.status = CanvasVerbalStatusType.NONE;
             }
             break;
         case CanvasVerbalStatusType.COMMON_MOUSE_DOWN:
@@ -218,11 +233,9 @@ CanvasVerbal.mouseDown = (event, canvasVerbal) => {
     if (obj) {
         canvasVerbal.status = CanvasVerbalStatusType.PITCH_ON;
         canvasVerbal.cleanAll(canvasVerbal.firstCtx);
-        obj.isPitchOn = true;
         obj.isShow = false;
         canvasVerbal.activeObject = obj;
         canvasVerbal.render();
-        obj.isPitchOn = true;
         obj.isShow = true;
         canvasVerbal.eventRender(obj);
         const remainX = mouseLeft - obj.left;
@@ -236,7 +249,7 @@ CanvasVerbal.mouseDown = (event, canvasVerbal) => {
         canvasVerbal.commonMouseDownPoint[1] = mouseTop;
     }
 };
-// 鼠标放开事件
+//? 鼠标放开事件
 CanvasVerbal.mouseUp = (event, canvasVerbal) => {
     const mouseLeft = event.offsetX;
     const mouseTop = event.offsetY;
@@ -259,11 +272,15 @@ CanvasVerbal.mouseUp = (event, canvasVerbal) => {
             edges.push(e2);
             edges.push(e3);
             edges.push(e4);
-            CanvasVerbal.judgeSelection(edges, canvasVerbal);
+            const ans = CanvasVerbal.judgeSelection(edges, canvasVerbal);
             canvasVerbal.commonMouseDownPoint[0] = 0;
             canvasVerbal.commonMouseDownPoint[1] = 0;
             canvasVerbal.cleanAll(canvasVerbal.firstCtx);
             canvasVerbal.activeObject = null;
+            if (ans[0] !== -1 && ans[1] !== -1) {
+                console.log("画一下: " + ans[2] + " " + ans[3]);
+                ControlBox.render(ans[0], ans[1], ans[2] - ans[0], ans[3] - ans[1], 0, canvasVerbal.firstCtx);
+            }
             break;
         case CanvasVerbalStatusType.PITCH_ON:
             canvasVerbal.status = CanvasVerbalStatusType.CONTROL;
@@ -272,7 +289,6 @@ CanvasVerbal.mouseUp = (event, canvasVerbal) => {
                 break;
             }
             canvasVerbal.activeObject.isShow = true;
-            canvasVerbal.activeObject.isPitchOn = true;
             const left1 = canvasVerbal.activeObject.sumLeft;
             const top1 = canvasVerbal.activeObject.sumTop;
             const width1 = canvasVerbal.activeObject.sumWidth;
@@ -281,19 +297,23 @@ CanvasVerbal.mouseUp = (event, canvasVerbal) => {
             canvasVerbal.render();
             break;
         case CanvasVerbalStatusType.DRAGING:
+            //* 如果是从拖拽状态放开的情况，则修改状态为控制
             canvasVerbal.status = CanvasVerbalStatusType.CONTROL;
+            //* 健壮性
             if (!canvasVerbal.activeObject) {
                 break;
             }
+            //* 清除事件画布
             canvasVerbal.cleanAll(canvasVerbal.firstCtx);
+            //* 渲染到第二层画布上
             canvasVerbal.activeObject.isShow = true;
             canvasVerbal.render();
-            canvasVerbal.activeObject.isShow = true;
-            canvasVerbal.activeObject.isPitchOn = true;
+            //* 显示控制框
             const left2 = canvasVerbal.activeObject.sumLeft;
             const top2 = canvasVerbal.activeObject.sumTop;
             const width2 = canvasVerbal.activeObject.sumWidth;
             const height2 = canvasVerbal.activeObject.sumHeight;
+            console.log("当前位置: " + left2 + " " + top2);
             ControlBox.render(left2, top2, width2, height2, canvasVerbal.activeObject.rotation, canvasVerbal.firstCtx);
             break;
     }

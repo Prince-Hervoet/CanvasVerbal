@@ -39,10 +39,10 @@ export interface IBaseStyleInfo {
 
 //! 对象基类
 export class VerbalObject {
-  //* 内容位置
+  //* 内容位置（不包含描边）
   public left: number = 0;
   public top: number = 0;
-  //* 内容大小
+  //* 内容大小（不包含描边）
   public width: number = 0;
   public height: number = 0;
 
@@ -52,27 +52,28 @@ export class VerbalObject {
   public sumWidth: number = 0;
   public sumHeight: number = 0;
 
-  //* 包围盒位置
+  //* 包围盒的四个点
   public boundingBoxp1: Point = new Point(0, 0);
   public boundingBoxp2: Point = new Point(0, 0);
   public boundingBoxp3: Point = new Point(0, 0);
   public boundingBoxp4: Point = new Point(0, 0);
 
-  // 边
+  //* 内容的边
   public edges: Edge[] = [];
+  //* 包围盒的边
   public boundingBoxEdges: Edge[] = [];
 
-  // style
+  //* 附加风格
   public styleInfo: StyleInfo = { fill: "", border_size: 0, border_color: "" };
 
-  // 放大缩小
+  //* 放大缩小系数
   public scaleX: number = 0;
   public scaleY: number = 0;
 
-  // 旋转角度
+  //* 旋转角度（不会影响内容的位置和边，因为只考虑包围盒即可）
   public rotation: number = 0;
 
-  // 形状类型
+  //* 形状类型
   public shapeName: string = "object";
   // id
   public objectId: string = "default";
@@ -97,6 +98,7 @@ export class VerbalObject {
     this.styleInfo = styleInfo;
     //* 计算加上描边的总大小
     this.calculatePosition(styleInfo);
+    //* 设置包围盒
     this.setBoundingBox();
   }
 

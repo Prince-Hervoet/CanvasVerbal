@@ -28,10 +28,10 @@ export class StyleInfo {
 //! 对象基类
 export class VerbalObject {
     constructor(baseStyleInfo, styleInfo) {
-        //* 内容位置
+        //* 内容位置（不包含描边）
         this.left = 0;
         this.top = 0;
-        //* 内容大小
+        //* 内容大小（不包含描边）
         this.width = 0;
         this.height = 0;
         //* 加上描边的总大小
@@ -39,27 +39,26 @@ export class VerbalObject {
         this.sumTop = 0;
         this.sumWidth = 0;
         this.sumHeight = 0;
-        //* 包围盒位置
+        //* 包围盒的四个点
         this.boundingBoxp1 = new Point(0, 0);
         this.boundingBoxp2 = new Point(0, 0);
         this.boundingBoxp3 = new Point(0, 0);
         this.boundingBoxp4 = new Point(0, 0);
-        // 边
+        //* 内容的边
         this.edges = [];
+        //* 包围盒的边
         this.boundingBoxEdges = [];
-        // style
+        //* 附加风格
         this.styleInfo = { fill: "", border_size: 0, border_color: "" };
-        // 放大缩小
+        //* 放大缩小系数
         this.scaleX = 0;
         this.scaleY = 0;
-        // 旋转角度
+        //* 旋转角度（不会影响内容的位置和边，因为只考虑包围盒即可）
         this.rotation = 0;
-        // 形状类型
+        //* 形状类型
         this.shapeName = "object";
         // id
         this.objectId = "default";
-        // 是否被选中
-        this.isPitchOn = false;
         // 是否可视
         this.isShow = true;
         //* 生成一个id
@@ -77,6 +76,7 @@ export class VerbalObject {
         this.styleInfo = styleInfo;
         //* 计算加上描边的总大小
         this.calculatePosition(styleInfo);
+        //* 设置包围盒
         this.setBoundingBox();
     }
     render(ctx) { }
