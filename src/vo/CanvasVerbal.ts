@@ -351,8 +351,8 @@ export class CanvasVerbal {
         canvasVerbal.commonMouseDownPoint[1] = 0;
         canvasVerbal.cleanAll(canvasVerbal.firstCtx!);
         canvasVerbal.activeObject = null;
-        if (ans[0] !== -1 && ans[1] !== -1) {
-          console.log("画一下: " + ans[2] + " " + ans[3]);
+        if (ans[0] !== -1 && ans[1] !== -1 && ans[2] !== -1 && ans[3] !== -1) {
+          // console.log("画一下: " + ans[2] + " " + ans[3]);
           ControlBox.render(
             ans[0],
             ans[1],
@@ -361,6 +361,7 @@ export class CanvasVerbal {
             0,
             canvasVerbal.firstCtx!
           );
+          canvasVerbal.status = CanvasVerbalStatusType.CONTROL;
         }
         break;
       case CanvasVerbalStatusType.PITCH_ON:

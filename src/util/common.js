@@ -82,5 +82,6 @@ export function judgeBoxSelection(boxEdges, targetEdges) {
             return true;
         }
     }
+    anyCoordconver;
     return false;
 }
