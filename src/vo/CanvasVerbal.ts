@@ -82,6 +82,8 @@ export class CanvasVerbal {
   private activeMouseRemainObject: number[] = [];
   // 状态
   private status: number = 0;
+
+  private isInCopying: boolean = false;
   // 普通按下鼠标按键的起始点
   private commonMouseDownPoint: number[] = [];
   constructor(
@@ -153,6 +155,10 @@ export class CanvasVerbal {
     });
     document.addEventListener("keydown", (event) => {
       CanvasVerbal.deleteObject(event, this);
+    });
+
+    document.addEventListener("keydown", (event) => {
+      CanvasVerbal.copyObject(event, this);
     });
   };
 
@@ -420,21 +426,40 @@ export class CanvasVerbal {
     }
   };
 
-  private static deleteObject(event: any, canvasVeral: CanvasVerbal) {
+  private static deleteObject(event: any, canvasVerbal: CanvasVerbal) {
     if (
-      (canvasVeral.status === CanvasVerbalStatusType.CONTROL &&
-        !canvasVeral.activeObject) ||
-      !canvasVeral.activeObjectNode
+      (canvasVerbal.status === CanvasVerbalStatusType.CONTROL &&
+        !canvasVerbal.activeObject) ||
+      !canvasVerbal.activeObjectNode
     ) {
       return;
     }
-    if (event.keyCode === 8) {
-      canvasVeral.objects.deleteNode(canvasVeral.activeObjectNode);
-      canvasVeral.activeObject = null;
-      canvasVeral.activeObjectNode = null;
-      canvasVeral.cleanAll(canvasVeral.firstCtx!);
-      canvasVeral.render();
-      canvasVeral.status = CanvasVerbalStatusType.NONE;
+    if (event.keyCode === 46) {
+      canvasVerbal.objects.deleteNode(canvasVerbal.activeObjectNode);
+      canvasVerbal.activeObject = null;
+      canvasVerbal.activeObjectNode = null;
+      canvasVerbal.cleanAll(canvasVerbal.firstCtx!);
+      canvasVerbal.render();
+      canvasVerbal.status = CanvasVerbalStatusType.NONE;
+    }
+  }
+
+  private static copyObject(event: any, canvasVerbal: CanvasVerbal) {
+    if (
+      canvasVerbal.status === CanvasVerbalStatusType.CONTROL &&
+      !canvasVerbal.activeObject
+    ) {
+      return;
+    }
+
+    if (event.ctrlKey && event.keyCode === 67) {
+      canvasVerbal.isInCopying = true;
+      console.log("复制了");
+    } else if (event.ctrlKey && event.keyCode === 86) {
+      console.log("asdfasdf");
+      const newObj: VerbalObject = canvasVerbal.activeObject?.copyMe()!;
+      canvasVerbal.addObject(newObj);
+      canvasVerbal.render();
     }
   }
 }

@@ -187,4 +187,17 @@ export class VerbalObject {
     this.render(ctx);
     ctx.restore();
   }
+
+  public copyMe() {
+    const newObj = new VerbalObject(
+      {
+        width: this.width,
+        height: this.height,
+        left: this.left,
+        top: this.top,
+      },
+      this.styleInfo
+    );
+    return newObj;
+  }
 }

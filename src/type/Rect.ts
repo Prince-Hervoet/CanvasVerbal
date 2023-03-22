@@ -69,4 +69,17 @@ export class Rect extends VerbalObject {
       ctx.stroke();
     }
   }
+
+  public copyMe() {
+    const newObj = new Rect(
+      {
+        width: this.width,
+        height: this.height,
+        left: this.left,
+        top: this.top,
+      },
+      this.styleInfo
+    );
+    return newObj;
+  }
 }

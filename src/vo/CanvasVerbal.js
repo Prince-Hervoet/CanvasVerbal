@@ -57,6 +57,7 @@ export class CanvasVerbal {
         this.activeMouseRemainObject = [];
         // 状态
         this.status = 0;
+        this.isInCopying = false;
         // 普通按下鼠标按键的起始点
         this.commonMouseDownPoint = [];
         //? 初始化事件绑定（绑定在第一层上）
@@ -75,6 +76,9 @@ export class CanvasVerbal {
             });
             document.addEventListener("keydown", (event) => {
                 CanvasVerbal.deleteObject(event, this);
+            });
+            document.addEventListener("keydown", (event) => {
+                CanvasVerbal.copyObject(event, this);
             });
         };
         //? 初始化各种dom和画布大小
@@ -119,19 +123,36 @@ export class CanvasVerbal {
     cleanAll(ctx) {
         ctx.clearRect(0, 0, this.width, this.height);
     }
-    static deleteObject(event, canvasVeral) {
-        if ((canvasVeral.status === CanvasVerbalStatusType.CONTROL &&
-            !canvasVeral.activeObject) ||
-            !canvasVeral.activeObjectNode) {
+    static deleteObject(event, canvasVerbal) {
+        if ((canvasVerbal.status === CanvasVerbalStatusType.CONTROL &&
+            !canvasVerbal.activeObject) ||
+            !canvasVerbal.activeObjectNode) {
             return;
         }
-        if (event.keyCode === 8) {
-            canvasVeral.objects.deleteNode(canvasVeral.activeObjectNode);
-            canvasVeral.activeObject = null;
-            canvasVeral.activeObjectNode = null;
-            canvasVeral.cleanAll(canvasVeral.firstCtx);
-            canvasVeral.render();
-            canvasVeral.status = CanvasVerbalStatusType.NONE;
+        if (event.keyCode === 46) {
+            canvasVerbal.objects.deleteNode(canvasVerbal.activeObjectNode);
+            canvasVerbal.activeObject = null;
+            canvasVerbal.activeObjectNode = null;
+            canvasVerbal.cleanAll(canvasVerbal.firstCtx);
+            canvasVerbal.render();
+            canvasVerbal.status = CanvasVerbalStatusType.NONE;
+        }
+    }
+    static copyObject(event, canvasVerbal) {
+        var _a;
+        if (canvasVerbal.status === CanvasVerbalStatusType.CONTROL &&
+            !canvasVerbal.activeObject) {
+            return;
+        }
+        if (event.ctrlKey && event.keyCode === 67) {
+            canvasVerbal.isInCopying = true;
+            console.log("复制了");
+        }
+        else if (event.ctrlKey && event.keyCode === 86) {
+            console.log("asdfasdf");
+            const newObj = (_a = canvasVerbal.activeObject) === null || _a === void 0 ? void 0 : _a.copyMe();
+            canvasVerbal.addObject(newObj);
+            canvasVerbal.render();
         }
     }
 }
