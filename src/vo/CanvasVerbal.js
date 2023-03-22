@@ -144,12 +144,7 @@ export class CanvasVerbal {
             !canvasVerbal.activeObject) {
             return;
         }
-        if (event.ctrlKey && event.keyCode === 67) {
-            canvasVerbal.isInCopying = true;
-            console.log("复制了");
-        }
-        else if (event.ctrlKey && event.keyCode === 86) {
-            console.log("asdfasdf");
+        if (event.ctrlKey && event.keyCode === 86) {
             const newObj = (_a = canvasVerbal.activeObject) === null || _a === void 0 ? void 0 : _a.copyMe();
             canvasVerbal.addObject(newObj);
             canvasVerbal.render();
