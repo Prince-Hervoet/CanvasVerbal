@@ -24,6 +24,8 @@ export enum CanvasVerbalStatusType {
   CONTROL = 4,
   // 高亮
   LIGHT = 5,
+  // 正在输入
+  INPUTTING = 6,
 }
 
 //? 射线检测，检测鼠标是否在一个几何图形内部
@@ -101,6 +103,6 @@ export function judgeBoxSelection(boxEdges: Edge[], targetEdges: Edge[]) {
     }
   }
 
-  anyCoordconver
+  anyCoordconver;
   return false;
 }

@@ -1,5 +1,5 @@
 //! 节点
-class ListNode {
+export class ListNode {
     constructor() {
         this.val = null;
         this.next = null;
@@ -36,7 +36,10 @@ export class ObjectList {
         node.front = null;
         node.next = null;
         if (next) {
-            next.front = null;
+            next.front = front;
+        }
+        if (node === this.tail) {
+            this.tail = front;
         }
         this.size -= 1;
     }

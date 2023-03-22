@@ -1,3 +1,4 @@
+import { ListNode } from "./../type/ObjectList";
 import { Group } from "./../type/Group";
 import { Edge } from "./../type/VerbalObject.js";
 import { ControlBox } from "./../type/ControlBox.js";
@@ -13,7 +14,7 @@ import {
 } from "../util/common.js";
 import { PitchOnBox } from "../type/PitchOnBox.js";
 
-const BODY_DOM: any = document.querySelector("body");
+const BODY_DOM: any = document.querySelector("document");
 
 //* 获取创建的canvas主类并将DOM添加到指定的父级元素中
 export function canvasVerbal(
@@ -76,6 +77,7 @@ export class CanvasVerbal {
   protected objects: ObjectList = new ObjectList();
   // 当前选中  的物体
   private activeObject: VerbalObject | null = null;
+  private activeObjectNode: ListNode | null = null;
   // 鼠标点击拖拽时，鼠标和物体左上角坐标的差值
   private activeMouseRemainObject: number[] = [];
   // 状态
@@ -149,6 +151,9 @@ export class CanvasVerbal {
     canvasDom.addEventListener("mouseup", (event) => {
       CanvasVerbal.mouseUp(event, this);
     });
+    document.addEventListener("keydown", (event) => {
+      CanvasVerbal.deleteObject(event, this);
+    });
   };
 
   //? 判断鼠标坐标是否在某个对象范围内
@@ -163,12 +168,12 @@ export class CanvasVerbal {
       const obj = run.val!;
       if (isInBoundingBox(mouseLeft, mouseTop, obj.boundingBoxEdges)) {
         if (radiographic(mouseLeft, mouseTop, obj.edges!)) {
-          return obj;
+          return { run, obj };
         }
       }
       run = run.front;
     }
-    return null;
+    return { run: null, obj: null };
   };
 
   private static judgeSelection = (box: Edge[], canvasVerbal: CanvasVerbal) => {
@@ -183,7 +188,6 @@ export class CanvasVerbal {
       const obj = run.val!;
       if (judgeBoxSelection(box, obj.boundingBoxEdges)) {
         groupArr.push(obj);
-        console.log("香蕉了");
         isOk = true;
         minLeft = Math.min(minLeft, obj.boundingBoxp1.left);
         minLeft = Math.min(minLeft, obj.boundingBoxp2.left);
@@ -228,7 +232,7 @@ export class CanvasVerbal {
   private static mouseMove = (event: any, canvasVerbal: CanvasVerbal) => {
     const mouseLeft = event.offsetX;
     const mouseTop = event.offsetY;
-    const obj = CanvasVerbal.judgeMouseInObject(
+    const { run, obj } = CanvasVerbal.judgeMouseInObject(
       mouseLeft,
       mouseTop,
       canvasVerbal
@@ -291,7 +295,7 @@ export class CanvasVerbal {
   private static mouseDown = (event: any, canvasVerbal: CanvasVerbal) => {
     const mouseLeft = event.offsetX;
     const mouseTop = event.offsetY;
-    const obj = CanvasVerbal.judgeMouseInObject(
+    const { run, obj } = CanvasVerbal.judgeMouseInObject(
       mouseLeft,
       mouseTop,
       canvasVerbal
@@ -302,6 +306,7 @@ export class CanvasVerbal {
       canvasVerbal.cleanAll(canvasVerbal.firstCtx!);
       obj.isShow = false;
       canvasVerbal.activeObject = obj;
+      canvasVerbal.activeObjectNode = run;
       canvasVerbal.render();
       obj.isShow = true;
       canvasVerbal.eventRender(obj);
@@ -403,8 +408,6 @@ export class CanvasVerbal {
         const top2 = canvasVerbal.activeObject.sumTop;
         const width2 = canvasVerbal.activeObject.sumWidth;
         const height2 = canvasVerbal.activeObject.sumHeight;
-        console.log("当前位置: " + left2 + " " + top2);
-
         ControlBox.render(
           left2,
           top2,
@@ -416,4 +419,22 @@ export class CanvasVerbal {
         break;
     }
   };
+
+  private static deleteObject(event: any, canvasVeral: CanvasVerbal) {
+    if (
+      (canvasVeral.status === CanvasVerbalStatusType.CONTROL &&
+        !canvasVeral.activeObject) ||
+      !canvasVeral.activeObjectNode
+    ) {
+      return;
+    }
+    if (event.keyCode === 8) {
+      canvasVeral.objects.deleteNode(canvasVeral.activeObjectNode);
+      canvasVeral.activeObject = null;
+      canvasVeral.activeObjectNode = null;
+      canvasVeral.cleanAll(canvasVeral.firstCtx!);
+      canvasVeral.render();
+      canvasVeral.status = CanvasVerbalStatusType.NONE;
+    }
+  }
 }

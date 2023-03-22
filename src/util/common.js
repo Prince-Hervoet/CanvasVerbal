@@ -21,6 +21,8 @@ export var CanvasVerbalStatusType;
     CanvasVerbalStatusType[CanvasVerbalStatusType["CONTROL"] = 4] = "CONTROL";
     // 高亮
     CanvasVerbalStatusType[CanvasVerbalStatusType["LIGHT"] = 5] = "LIGHT";
+    // 正在输入
+    CanvasVerbalStatusType[CanvasVerbalStatusType["INPUTTING"] = 6] = "INPUTTING";
 })(CanvasVerbalStatusType || (CanvasVerbalStatusType = {}));
 //? 射线检测，检测鼠标是否在一个几何图形内部
 export function radiographic(left, top, edges) {

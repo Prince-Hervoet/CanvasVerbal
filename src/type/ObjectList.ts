@@ -1,7 +1,7 @@
 import { VerbalObject } from "./VerbalObject.js";
 
 //! 节点
-class ListNode {
+export class ListNode {
   val: VerbalObject | null = null;
   next: ListNode | null = null;
   front: ListNode | null = null;
@@ -40,7 +40,10 @@ export class ObjectList {
     node.front = null;
     node.next = null;
     if (next) {
-      next.front = null;
+      next.front = front;
+    }
+    if (node === this.tail) {
+      this.tail = front;
     }
     this.size -= 1;
   }
