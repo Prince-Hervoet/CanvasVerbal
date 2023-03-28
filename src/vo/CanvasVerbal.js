@@ -1,3 +1,4 @@
+import { Group } from "./../type/Group.js";
 import { Edge } from "./../type/VerbalObject.js";
 import { ControlBox } from "./../type/ControlBox.js";
 import { Checkbox } from "./../type/Checkbox.js";
@@ -63,7 +64,7 @@ export class CanvasVerbal {
         //? 初始化事件绑定（绑定在第一层上）
         this.initEventBinding = (canvasDom) => {
             canvasDom.addEventListener("click", (event) => {
-                CanvasVerbal.singleClick(event, this);
+                // CanvasVerbal.singleClick(event, this);
             });
             canvasDom.addEventListener("mousemove", (event) => {
                 CanvasVerbal.mouseMove(event, this);
@@ -207,12 +208,22 @@ CanvasVerbal.judgeSelection = (box, canvasVerbal) => {
                 groupArr[0].boundingBoxp3.top,
             ];
         }
+        const g = new Group({
+            left: minLeft,
+            top: minTop,
+            width: maxLeft - minLeft,
+            height: maxTop - minTop,
+        }, { border_size: 5, border_color: "green" });
+        for (const ga of groupArr) {
+            g.push(ga);
+        }
+        canvasVerbal.addObject(g);
         return [minLeft, minTop, maxLeft, maxTop];
     }
     return [-1, -1, -1, -1];
 };
-//? 单击事件
-CanvasVerbal.singleClick = (event, canvasVerbal) => { };
+// //? 单击事件
+// private static singleClick = (event: any, canvasVerbal: CanvasVerbal) => {};
 //? 鼠标移动事件
 CanvasVerbal.mouseMove = (event, canvasVerbal) => {
     const mouseLeft = event.offsetX;
@@ -312,10 +323,11 @@ CanvasVerbal.mouseUp = (event, canvasVerbal) => {
             canvasVerbal.commonMouseDownPoint[1] = 0;
             canvasVerbal.cleanAll(canvasVerbal.firstCtx);
             canvasVerbal.activeObject = null;
+            // 有框选到组
             if (ans[0] !== -1 && ans[1] !== -1 && ans[2] !== -1 && ans[3] !== -1) {
-                // console.log("画一下: " + ans[2] + " " + ans[3]);
                 ControlBox.render(ans[0], ans[1], ans[2] - ans[0], ans[3] - ans[1], 0, canvasVerbal.firstCtx);
                 canvasVerbal.status = CanvasVerbalStatusType.CONTROL;
+                canvasVerbal.render();
             }
             break;
         case CanvasVerbalStatusType.PITCH_ON:
