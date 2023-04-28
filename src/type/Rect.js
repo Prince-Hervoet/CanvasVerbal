@@ -1,29 +1,21 @@
 import { BaseShapeType } from "../util/common.js";
-import { Edge, Point, VerbalObject } from "./VerbalObject.js";
+import { Edge, Point, VerbalObject, } from "./VerbalObject.js";
 export class Rect extends VerbalObject {
-    constructor(args) {
-        super();
+    constructor(baseStyleInfo, styleInfo) {
+        super(baseStyleInfo, styleInfo);
         this.rx = 0;
         this.ry = 0;
         this.shapeName = BaseShapeType.RECT;
-        const that = this;
-        for (const a in args) {
-            if (a in that) {
-                that[a] = args[a];
-            }
-        }
         this.setEdges();
-        this.boundingBoxp1 = new Point(this.left, this.top);
-        this.boundingBoxp2 = new Point(this.left + this.width, this.top + this.height);
     }
     setEdges() {
-        const x1 = this.left, y1 = this.top;
+        const x1 = this.sumLeft, y1 = this.sumTop;
         const p1 = new Point(x1, y1);
-        const x2 = this.left + this.width, y2 = this.top;
+        const x2 = this.sumLeft + this.sumWidth, y2 = this.sumTop;
         const p2 = new Point(x2, y2);
-        const x3 = this.left + this.width, y3 = this.top + this.height;
+        const x3 = this.sumLeft + this.sumWidth, y3 = this.sumTop + this.sumHeight;
         const p3 = new Point(x3, y3);
-        const x4 = this.left, y4 = this.top + this.height;
+        const x4 = this.sumLeft, y4 = this.sumTop + this.sumHeight;
         const p4 = new Point(x4, y4);
         const e1 = new Edge(p1, p2);
         const e2 = new Edge(p2, p3);
@@ -53,8 +45,17 @@ export class Rect extends VerbalObject {
         if (this.styleInfo.fill) {
             ctx.fill();
         }
-        if (this.isStroke) {
+        if (this.styleInfo.border_size) {
             ctx.stroke();
         }
+    }
+    copyMe() {
+        const newObj = new Rect({
+            width: this.width,
+            height: this.height,
+            left: this.left,
+            top: this.top,
+        }, this.styleInfo);
+        return newObj;
     }
 }

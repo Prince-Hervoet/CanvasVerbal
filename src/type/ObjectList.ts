@@ -1,11 +1,13 @@
 import { VerbalObject } from "./VerbalObject.js";
 
-class ListNode {
+//! 节点
+export class ListNode {
   val: VerbalObject | null = null;
   next: ListNode | null = null;
   front: ListNode | null = null;
 }
 
+//! 对象链表类
 export class ObjectList {
   public head: ListNode | null = null;
   public tail: ListNode | null = null;
@@ -24,7 +26,25 @@ export class ObjectList {
     node.val = object;
     this.tail!.next = node;
     node.front = this.tail;
-    this.tail = this.tail!.next;
+    this.tail = node;
     this.size += 1;
+  }
+
+  public deleteNode(node: ListNode) {
+    if (!node || node === this.head) {
+      return;
+    }
+    const next = node.next;
+    const front = node.front!;
+    front.next = next;
+    node.front = null;
+    node.next = null;
+    if (next) {
+      next.front = front;
+    }
+    if (node === this.tail) {
+      this.tail = front;
+    }
+    this.size -= 1;
   }
 }

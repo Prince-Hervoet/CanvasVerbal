@@ -1,5 +1,7 @@
+//! 框选矩形
 export class Checkbox {
     static render(startX, startY, endX, endY, ctx) {
+        //* 将传入的任意坐标转化为左上角到右下角
         let biggerX = startX >= endX ? startX : endX;
         let biggerY = startY >= endY ? startY : endY;
         let smallerX = startX <= endX ? startX : endX;

@@ -1,39 +1,34 @@
-import { BaseShapeType } from "../util/common.js";
 import { Edge, Point, VerbalObject } from "./VerbalObject.js";
+export class Group extends VerbalObject {
+  // 包含的对象组
+  objs: VerbalObject[] = [];
+  remainXs: number[] = [];
+  remainYs: number[] = [];
+  shapeName = "gruop";
 
-export class Rect extends VerbalObject {
-  public rx: number = 0;
-  public ry: number = 0;
-  public shapeName: string = BaseShapeType.RECT;
-
-  constructor(args: any) {
-    super();
-    const that: any = this;
-    for (const a in args) {
-      if (a in that) {
-        that[a] = args[a];
-      }
-    }
+  public constructor(baseStyleInf: any, styleInfo: any) {
+    super(baseStyleInf, styleInfo);
     this.setEdges();
-    this.boundingBoxp1 = new Point(this.left, this.top);
-    this.boundingBoxp2 = new Point(
-      this.left + this.width,
-      this.top + this.height
-    );
   }
 
-  private setEdges() {
-    const x1 = this.left,
-      y1 = this.top;
+  public push(obj: VerbalObject) {
+    this.objs.push(obj);
+    this.remainXs.push(obj.left - this.left);
+    this.remainYs.push(obj.top - this.top);
+  }
+
+  protected setEdges() {
+    const x1 = this.sumLeft,
+      y1 = this.sumTop;
     const p1 = new Point(x1, y1);
-    const x2 = this.left + this.width,
-      y2 = this.top;
+    const x2 = this.sumLeft + this.sumWidth,
+      y2 = this.sumTop;
     const p2 = new Point(x2, y2);
-    const x3 = this.left + this.width,
-      y3 = this.top + this.height;
+    const x3 = this.sumLeft + this.sumWidth,
+      y3 = this.sumTop + this.sumHeight;
     const p3 = new Point(x3, y3);
-    const x4 = this.left,
-      y4 = this.top + this.height;
+    const x4 = this.sumLeft,
+      y4 = this.sumTop + this.sumHeight;
     const p4 = new Point(x4, y4);
 
     const e1 = new Edge(p1, p2);
@@ -70,8 +65,16 @@ export class Rect extends VerbalObject {
     if (this.styleInfo.fill) {
       ctx.fill();
     }
-    if (this.isStroke) {
+    if (this.styleInfo.border_size) {
       ctx.stroke();
+    }
+  }
+
+  public changePosition(newLeft: number, newTop: number): void {
+    super.changePosition(newLeft, newTop);
+    for (let i = 0; i < this.objs.length; i++) {
+      const obj = this.objs[i];
+      obj.changePosition(newLeft + this.remainXs[i], newTop + this.remainYs[i]);
     }
   }
 }

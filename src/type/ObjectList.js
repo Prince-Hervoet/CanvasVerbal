@@ -1,10 +1,12 @@
-class ListNode {
+//! 节点
+export class ListNode {
     constructor() {
         this.val = null;
         this.next = null;
         this.front = null;
     }
 }
+//! 对象链表类
 export class ObjectList {
     constructor() {
         this.head = null;
@@ -21,7 +23,24 @@ export class ObjectList {
         node.val = object;
         this.tail.next = node;
         node.front = this.tail;
-        this.tail = this.tail.next;
+        this.tail = node;
         this.size += 1;
+    }
+    deleteNode(node) {
+        if (!node || node === this.head) {
+            return;
+        }
+        const next = node.next;
+        const front = node.front;
+        front.next = next;
+        node.front = null;
+        node.next = null;
+        if (next) {
+            next.front = front;
+        }
+        if (node === this.tail) {
+            this.tail = front;
+        }
+        this.size -= 1;
     }
 }

@@ -1,9 +1,11 @@
-export class Checkbox {
+//! 选中状态高亮矩形
+export class PitchOnBox {
   public static render(
     startX: number,
     startY: number,
     endX: number,
     endY: number,
+    angle: number,
     ctx: CanvasRenderingContext2D
   ) {
     let biggerX = startX >= endX ? startX : endX;
@@ -15,8 +17,9 @@ export class Checkbox {
     const topLeftCornerX = biggerX - remainX;
     const topLeftCornerY = smallerY;
     ctx.beginPath();
-    ctx.fillStyle = "rgba(255,0,0,0.1)";
+    ctx.fillStyle = "rgb(255,255,255,0.4)";
     ctx.rect(topLeftCornerX, topLeftCornerY, remainX, remainY);
+    ctx.rotate(angle);
     ctx.fill();
     ctx.closePath();
   }
