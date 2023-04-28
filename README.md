@@ -1,6 +1,6 @@
-# canvasVerbal
+# CanvasVerbal
 
-Learn about a semi-finished event system implemented in canvas.If you like it, you can help with the rest of the work.
+\*Learn about a semi-finished event system implemented in canvas.If you like it, you can help with the rest of the work.\*
 
 ```
     import { Rect } from "./../src/type/Rect.js";
