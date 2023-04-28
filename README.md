@@ -35,18 +35,6 @@ _Learn about a semi-finished event system implemented in canvas.If you like it, 
     { width: 100, height: 100, left: 500, top: 20 },
     { fill: "blue", border_size: 10, border_color: "green" }
     );
-    const test7 = new Rect(
-    { width: 100, height: 100, left: 500, top: 20 },
-    { fill: "blue", border_size: 10, border_color: "green" }
-    );
-    const test8 = new Rect(
-    { width: 100, height: 100, left: 500, top: 20 },
-    { fill: "blue", border_size: 10, border_color: "green" }
-    );
-    const test9 = new Rect(
-    { width: 100, height: 100, left: 500, top: 20 },
-    { fill: "blue", border_size: 10, border_color: "green" }
-    );
 
     cv.addObject(test1);
     cv.addObject(test2)
@@ -56,3 +44,6 @@ _Learn about a semi-finished event system implemented in canvas.If you like it, 
     .addObject(test6);
     cv.render();
 ```
+
+![image](https://user-images.githubusercontent.com/122962161/235106888-046f7153-de72-44b0-adbe-73efa4c80b8b.png)
+
