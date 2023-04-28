@@ -56,3 +56,5 @@ _Learn about a semi-finished event system implemented in canvas.If you like it, 
     .addObject(test6);
     cv.render();
 ```
+
+![image](https://user-images.githubusercontent.com/122962161/235107176-d9c647bf-0746-4d41-885e-ba6d153d3375.png)
